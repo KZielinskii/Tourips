@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "609152391063",
+    "project_id": "tourips-73681",
+    "storage_bucket": "tourips-73681.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:609152391063:android:333500dd0a546ae5f696d2",
+        "android_client_info": {
+          "package_name": "com.example.tourpis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhf7f-9HwW7d_p3so3RUuJOdAzgKetmEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

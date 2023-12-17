@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/screens/home_screen.dart';
 import 'package:tourpis/screens/signup_screen.dart';
@@ -37,19 +38,24 @@ class _SignInScreenState extends State<SignInScreen> {
             child: Column(
               children: <Widget>[
                 logoWidget("assets/images/logo.png"),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Wprowadź email", Icons.person_outline, false, _emailTextController),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Wprowadź hasło", Icons.lock_outline, true, _passwordTextController),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 singInButton(context, true, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                  FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailTextController.text, password: _passwordTextController.text).then((value) {
+                    print("Sign In");
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+                  }).onError((error, stackTrace) {
+                    print("Error ${error.toString()}");
+                  });
                 }),
                 singUpOption()
               ],

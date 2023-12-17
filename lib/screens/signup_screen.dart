@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/screens/signin_screen.dart';
@@ -14,10 +15,10 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _passwordRepeatTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
-  TextEditingController _loginTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _passwordRepeatTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _loginTextController = TextEditingController();
 
 
   @override
@@ -42,25 +43,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: <Widget>[
                 logoWidget("assets/images/logo_text.png"),
                 reusableTextField("Wprowadź login", Icons.person_outline, false, _loginTextController),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Wprowadź email", Icons.person_outline, false, _emailTextController),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Wprowadź hasło", Icons.lock_outline, true, _passwordTextController),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Powtórz hasło", Icons.lock_outline, true, _passwordRepeatTextController),
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 singInButton(context, false, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                  FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      email: _emailTextController.text,
+                      password: _passwordTextController.text)
+                      .then((value) {
+                        print("Created New Account");
+                    Navigator.push(context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()));
+                  }).onError((error, stackTrace)
+                  {
+                    print("Error ${error.toString()}");
+                  });
                 }),
-                singInOption()
               ],
             ),
           ),

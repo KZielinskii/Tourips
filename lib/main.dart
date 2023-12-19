@@ -7,8 +7,8 @@ Future<void> main() async {
 
   try {
     await Firebase.initializeApp();
-  } catch (e) {
-    print('Error initializing Firebase: $e');
+  } catch (e, stackTrace) {
+    print('Error initializing Firebase: $e\n$stackTrace');
   }
 
   runApp(const MyApp());

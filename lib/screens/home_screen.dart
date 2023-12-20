@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tourpis/screens/signin_screen.dart';
 import 'package:tourpis/screens/add_event_screen.dart';
 import 'package:tourpis/screens/home_events_page.dart';
 import 'package:tourpis/screens/home_recommended_page.dart';

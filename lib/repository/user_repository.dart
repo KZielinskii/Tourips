@@ -29,6 +29,7 @@ class UserRepository {
     if (querySnapshot.docs.isNotEmpty) {
       UserModel user = UserModel.fromJson(querySnapshot.docs.first.data() as Map<String, dynamic>);
       print('Znaleziono użytkownika: ${user.login}');
+      return user;
     } else {
       print('Nie znaleziono użytkownika o podanym UID');
     }

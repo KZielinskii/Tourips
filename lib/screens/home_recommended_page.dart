@@ -48,6 +48,10 @@ class HomeRecommendedPage extends StatelessWidget {
                 title: data['title'],
                 description: data['description'],
                 owner: data['owner'],
+                startDate: data['startDate'],
+                endDate: data['endDate'],
+                capacity: data['capacity'],
+                participants: data['participants'],
               );
             }).toList();
 

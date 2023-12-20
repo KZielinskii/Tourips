@@ -48,6 +48,10 @@ class HomeEventsPage extends StatelessWidget {
                 title: data['title'],
                 description: data['description'],
                 owner: data['owner'],
+                startDate: (data['startDate'] as Timestamp).toDate(),
+                endDate: (data['endDate'] as Timestamp).toDate(),
+                capacity: data['capacity'],
+                participants: data['participants'],
               );
             }).toList();
 

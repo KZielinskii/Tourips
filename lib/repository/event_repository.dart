@@ -14,15 +14,26 @@ class EventRepository {
     return user?.uid;
   }
 
-  Future<void> createEvent(String title, String description) async {
+  Future<void> createEvent(String title, String description, DateTime startDate, DateTime endDate, int capacity) async {
     String? ownerId = await getCurrentUserId();
 
     if (ownerId != null) {
       UserModel? owner = await userRepository.getUserByUid(ownerId);
 
+
       if (owner != null) {
-        EventModel event = EventModel(title: title, description: description, owner: owner);
+        EventModel event = EventModel(
+          title: title,
+          description: description,
+          owner: owner.id,
+          startDate: startDate,
+          endDate: endDate,
+          capacity: capacity,
+          participants: 1,
+        );
+
         await _db.collection('events').doc().set(event.toJson());
+        print('Stworzono wydarzenie');
       } else {
         print('Błąd: Nie udało się pobrać informacji o właścicielu');
       }
@@ -30,5 +41,4 @@ class EventRepository {
       print('Błąd: Nie udało się pobrać ID użytkownika');
     }
   }
-
 }

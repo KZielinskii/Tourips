@@ -23,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: Colors.white,
           fontSize: 20,
           fontWeight: FontWeight.bold,
-          fontFamily: 'YourFontFamily',
         ),
       ),
       body: Container(

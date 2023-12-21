@@ -21,11 +21,12 @@ class EventRepository {
       UserModel? owner = await userRepository.getUserByUid(ownerId);
 
 
+
       if (owner != null) {
         EventModel event = EventModel(
           title: title,
           description: description,
-          owner: owner.id,
+          owner: owner.login,
           startDate: startDate,
           endDate: endDate,
           capacity: capacity,

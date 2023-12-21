@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tourpis/screens/add_event_screen.dart';
-import 'package:tourpis/screens/home_events_page.dart';
-import 'package:tourpis/screens/home_recommended_page.dart';
-import '../utils/color_utils.dart';
+import 'package:tourpis/screens/home/home_events_page.dart';
+import 'package:tourpis/screens/home/home_recommended_page.dart';
+import '../../utils/color_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -63,11 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 10), // Spacer
-
-                  // Profile Icon
                   const CircleAvatar(
                     backgroundColor: Colors.white,
-                    // Add your profile picture logic here
                   ),
                 ],
               ),

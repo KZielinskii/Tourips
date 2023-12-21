@@ -1,4 +1,3 @@
-import 'package:tourpis/models/UserModel.dart';
 
 class EventModel {
   final String? id;

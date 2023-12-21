@@ -2,22 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/models/EventModel.dart';
 
-class EventCard extends StatelessWidget {
-  final EventModel event;
+import 'event_card.dart';
 
-  const EventCard({Key? key, required this.event}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(event.title),
-      subtitle: Text(event.description),
-    );
-  }
-}
-
-class HomeEventsPage extends StatelessWidget {
-  const HomeEventsPage({Key? key}) : super(key: key);
+class HomeRecommendedPage extends StatelessWidget {
+  const HomeRecommendedPage({Key? key}) : super(key: key);
 
   void goToEventDetails(BuildContext context) {
     //todo

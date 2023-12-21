@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/repository/event_repository.dart';
 
 import '../utils/color_utils.dart';
+import '../widgets/widget.dart';
 
 class AddEventScreen extends StatefulWidget {
   const AddEventScreen({Key? key}) : super(key: key);
@@ -79,17 +80,17 @@ class _AddEventScreenState extends State<AddEventScreen> {
     return TextFormField(
       controller: controller,
       enabled: false,
-      style: const TextStyle(color: Colors.white), // Text color set to white
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(color: Colors.white), // Label color set to white
+        labelStyle: const TextStyle(color: Colors.white),
         contentPadding: const EdgeInsets.all(16.0),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(color: Colors.white), // Border color set to white
+          borderSide: const BorderSide(color: Colors.white),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white), // Border color set to white
+          borderSide: const BorderSide(color: Colors.white),
           borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
@@ -104,7 +105,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Twój profil"),
+        title: const Text("Dodaj wydarzenie"),
         backgroundColor: hexStringToColor("2F73B1"),
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -132,6 +133,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
             ),
             child: Column(
               children: [
+                logoWidget("assets/images/logo_text.png"),
                 TextFormField(
                   controller: _titleController,
                   style: const TextStyle(color: Colors.white),
@@ -329,6 +331,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
           }
         },
         tooltip: 'Dodaj',
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.check),
       ),
     );

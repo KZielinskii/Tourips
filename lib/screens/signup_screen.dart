@@ -6,7 +6,7 @@ import 'package:tourpis/screens/signin_screen.dart';
 
 import '../utils/color_utils.dart';
 import '../widgets/widget.dart';
-import 'home_screen.dart';
+import 'home/home_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

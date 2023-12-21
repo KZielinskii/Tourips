@@ -95,6 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     return;
                   }
                 }),
+                singInOption(),
               ],
             ),
           ),

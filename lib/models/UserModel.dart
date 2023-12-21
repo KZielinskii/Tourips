@@ -18,4 +18,13 @@ class UserModel {
       "uid": uid,
     };
   }
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      id: json['id'],
+      login: json['login'],
+      email: json['email'],
+      uid: json['uid'],
+    );
+  }
 }

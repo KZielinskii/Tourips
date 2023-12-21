@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tourpis/screens/home_screen.dart';
+import 'package:tourpis/screens/home/home_screen.dart';
 import 'package:tourpis/screens/signup_screen.dart';
 import '../utils/color_utils.dart';
 import '../widgets/widget.dart';
@@ -14,8 +14,8 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
 
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class _SignInScreenState extends State<SignInScreen> {
         style: TextStyle(color: Colors.white70)),
         GestureDetector(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
           },
           child: const Text(
             "Zarejestruj się",

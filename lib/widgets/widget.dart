@@ -9,6 +9,15 @@ Image logoWidget(String name) {
   );
 }
 
+Image smallLogoWidget(String name) {
+  return Image.asset(
+    name,
+    fit: BoxFit.fitWidth,
+    width: 256,
+    height: 64,
+  );
+}
+
 TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     TextEditingController controller) {
   return TextField(

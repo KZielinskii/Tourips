@@ -85,3 +85,4 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 }
+//todo Wyświetlanie komunikatów o nieporawnym logowaniu

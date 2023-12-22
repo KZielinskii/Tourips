@@ -3,6 +3,7 @@ import 'package:tourpis/repository/event_repository.dart';
 
 import '../utils/color_utils.dart';
 import '../widgets/widget.dart';
+import 'map/map_screen.dart';
 
 class AddEventScreen extends StatefulWidget {
   const AddEventScreen({Key? key}) : super(key: key);
@@ -129,11 +130,11 @@ class _AddEventScreenState extends State<AddEventScreen> {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.05,
-              vertical: MediaQuery.of(context).size.height * 0.05,
+              vertical: MediaQuery.of(context).size.height * 0.02,
             ),
             child: Column(
               children: [
-                logoWidget("assets/images/logo_text.png"),
+                smallLogoWidget("assets/images/logo_text.png"),
                 TextFormField(
                   controller: _titleController,
                   style: const TextStyle(color: Colors.white),
@@ -288,6 +289,22 @@ class _AddEventScreenState extends State<AddEventScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () =>
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen())),
+                      child: const Text('Wybierz trasę', style: TextStyle(color: Colors.blue)),
+                    ),
+                    const SizedBox(width: 16.0),
+                    ElevatedButton(
+                      onPressed: () => showFriends(),
+                      child: const Text('Zaproś znajomych', style: TextStyle(color: Colors.blue)),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -335,5 +352,9 @@ class _AddEventScreenState extends State<AddEventScreen> {
         child: const Icon(Icons.check),
       ),
     );
+  }
+
+  showFriends() {
+    //todo
   }
 }

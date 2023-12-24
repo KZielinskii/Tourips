@@ -9,6 +9,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   Set<Polyline> _polylines = {};
+  Set<Marker> _markers = {};
   List<LatLng> _points = [];
 
   @override
@@ -20,6 +21,7 @@ class _MapScreenState extends State<MapScreen> {
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         polylines: _polylines,
+        markers: _markers,
         initialCameraPosition: const CameraPosition(
           target: LatLng(51.7592, 19.4559),
           zoom: 10.0,
@@ -40,6 +42,19 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _addPoint(LatLng point) {
+    final String markerIdValue = 'marker_id_${_markers.length}';
+    final MarkerId markerId = MarkerId(markerIdValue);
+
+    Marker marker = Marker(
+      markerId: markerId,
+      position: point,
+      infoWindow: InfoWindow(title: markerIdValue),
+    );
+
+    setState(() {
+      _markers.add(marker);
+    });
+    
     setState(() {
       _points.add(point);
     });

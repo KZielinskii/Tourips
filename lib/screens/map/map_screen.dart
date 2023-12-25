@@ -15,12 +15,6 @@ class _MapScreenState extends State<MapScreen> {
   Set<Polyline> _polylines = {};
   Map<String, Marker> _markers = {};
   List<LatLng> _points = [];
-  bool selectingStart = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,27 +32,19 @@ class _MapScreenState extends State<MapScreen> {
           zoom: 10.0,
         ),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                selectingStart = true;
-              });
-            },
-            backgroundColor: Colors.green,
-            child: Icon(Icons.start),
-          ),
-          SizedBox(height: 16),
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                selectingStart = false;
-              });
-            },
-            backgroundColor: Colors.red,
-            child: Icon(Icons.flag),
+          Padding(
+            padding: const EdgeInsets.only(left: 32.0),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                _removeLastPoint();
+              },
+              backgroundColor: Colors.red,
+              icon: const Icon(Icons.remove),
+              label: const Text('Usuń'),
+            ),
           ),
         ],
       ),
@@ -73,15 +59,9 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMapTap(LatLng location) {
     setState(() {
-      if (selectingStart) {
-        addMarker('start', location);
-        _points.clear();
-        _points.add(location);
-      } else {
-        addMarker('end', location);
+        addMarker('point${_markers.length + 1}', location);
         _points.add(location);
         _calculateAndDrawRoute();
-      }
     });
   }
 
@@ -90,17 +70,37 @@ class _MapScreenState extends State<MapScreen> {
       markerId: MarkerId(id),
       position: location,
       infoWindow: InfoWindow(title: location.toString()),
+      draggable: true,
+      onDragEnd: (newPosition) => _onMarkerDragEnd(id, newPosition),
     );
     _markers[id] = marker;
+  }
+
+  void _onMarkerDragEnd(String markerId, LatLng newPosition) {
+    setState(() {
+      _points[_markers.keys.toList().indexOf(markerId)] = newPosition;
+      _calculateAndDrawRoute();
+    });
   }
 
   void _calculateAndDrawRoute() {
     _polylines.clear();
     _polylines.add(Polyline(
-      polylineId: PolylineId('route'),
+      polylineId: const PolylineId('route'),
       points: _points,
       color: Colors.blue,
       width: 5,
     ));
+  }
+
+  void _removeLastPoint() {
+    if (_points.isNotEmpty) {
+      setState(() {
+        var lastMarkerKey = _markers.keys.toList().last;
+        _markers.remove(lastMarkerKey);
+        _points.removeLast();
+        _calculateAndDrawRoute();
+      });
+    }
   }
 }

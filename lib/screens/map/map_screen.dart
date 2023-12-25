@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-const LatLng startPosition = LatLng(25, 55);
+const LatLng startPosition = LatLng(52, 20);
+const Duration updateInterval = Duration(seconds: 10);
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -15,6 +18,22 @@ class _MapScreenState extends State<MapScreen> {
   Set<Polyline> _polylines = {};
   Map<String, Marker> _markers = {};
   List<LatLng> _points = [];
+  late Timer _locationUpdateTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+    _locationUpdateTimer = Timer.periodic(updateInterval, (Timer timer) {
+      _updateCurrentLocation();
+    });
+  }
+
+  @override
+  void dispose() {
+    _locationUpdateTimer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,18 +78,22 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onMapTap(LatLng location) {
     setState(() {
-        addMarker('point${_markers.length + 1}', location);
-        _points.add(location);
-        _calculateAndDrawRoute();
+      addMarker(
+          'point${_markers.length + 1}',
+          location,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure));
+      _points.add(location);
+      _calculateAndDrawRoute();
     });
   }
 
-  void addMarker(String id, LatLng location) {
+  void addMarker(String id, LatLng location, {required BitmapDescriptor icon}) {
     var marker = Marker(
       markerId: MarkerId(id),
       position: location,
       infoWindow: InfoWindow(title: location.toString()),
       draggable: true,
+      icon: icon,
       onDragEnd: (newPosition) => _onMarkerDragEnd(id, newPosition),
     );
     _markers[id] = marker;
@@ -103,4 +126,52 @@ class _MapScreenState extends State<MapScreen> {
       });
     }
   }
+
+  void _getCurrentLocation() async {
+    try {
+      Position? position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      addMarker('currentLocation', currentLocation,
+          icon: await iconDescriptor("assets/images/user_localization.png"));
+      setState(() {
+        mapController = mapController;
+      });
+      mapController.animateCamera(CameraUpdate.newLatLng(currentLocation));
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void _updateCurrentLocation() async {
+    try {
+      Position? position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      addMarker('currentLocation', currentLocation,
+          icon: await iconDescriptor("assets/images/user_localization.png"));
+      setState(() {
+        mapController = mapController;
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<BitmapDescriptor> iconDescriptor(String name) async {
+    try {
+      const ImageConfiguration configuration = ImageConfiguration();
+      final BitmapDescriptor bitmapDescriptor =
+      await BitmapDescriptor.fromAssetImage(configuration, name);
+      return bitmapDescriptor;
+    } catch (e) {
+      print('Error loading image: $e');
+      return BitmapDescriptor.defaultMarker;
+    }
+  }
+
+
 }
+

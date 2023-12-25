@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+const LatLng startPosition = LatLng(25, 55);
+
 class MapScreen extends StatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
@@ -9,28 +13,40 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   Set<Polyline> _polylines = {};
-  Set<Marker> _markers = {};
+  Map<String, Marker> _markers = {};
   List<LatLng> _points = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wybierz trase'),
+        title: const Text('Wybierz trasę'),
       ),
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         polylines: _polylines,
-        markers: _markers,
+        markers: _markers.values.toSet(),
+        onTap: _onMapTap,
         initialCameraPosition: const CameraPosition(
-          target: LatLng(51.7592, 19.4559),
+          target: startPosition,
           zoom: 10.0,
         ),
-        onTap: _addPoint,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _drawRoute,
-        child: const Icon(Icons.directions),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 32.0),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                _removeLastPoint();
+              },
+              backgroundColor: Colors.red,
+              icon: const Icon(Icons.remove),
+              label: const Text('Usuń'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -41,40 +57,50 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void _addPoint(LatLng point) {
-    final String markerIdValue = 'marker_id_${_markers.length}';
-    final MarkerId markerId = MarkerId(markerIdValue);
-
-    Marker marker = Marker(
-      markerId: markerId,
-      position: point,
-      infoWindow: InfoWindow(title: markerIdValue),
-    );
-
+  void _onMapTap(LatLng location) {
     setState(() {
-      _markers.add(marker);
-    });
-    
-    setState(() {
-      _points.add(point);
+        addMarker('point${_markers.length + 1}', location);
+        _points.add(location);
+        _calculateAndDrawRoute();
     });
   }
 
-  void _drawRoute() {
-    if (_points.length > 1) {
-      PolylineId id = const PolylineId("route");
-      Polyline polyline = Polyline(
-        polylineId: id,
-        color: Colors.blue,
-        points: _points,
-        width: 3,
-      );
+  void addMarker(String id, LatLng location) {
+    var marker = Marker(
+      markerId: MarkerId(id),
+      position: location,
+      infoWindow: InfoWindow(title: location.toString()),
+      draggable: true,
+      onDragEnd: (newPosition) => _onMarkerDragEnd(id, newPosition),
+    );
+    _markers[id] = marker;
+  }
 
+  void _onMarkerDragEnd(String markerId, LatLng newPosition) {
+    setState(() {
+      _points[_markers.keys.toList().indexOf(markerId)] = newPosition;
+      _calculateAndDrawRoute();
+    });
+  }
+
+  void _calculateAndDrawRoute() {
+    _polylines.clear();
+    _polylines.add(Polyline(
+      polylineId: const PolylineId('route'),
+      points: _points,
+      color: Colors.blue,
+      width: 5,
+    ));
+  }
+
+  void _removeLastPoint() {
+    if (_points.isNotEmpty) {
       setState(() {
-        _polylines.add(polyline);
+        var lastMarkerKey = _markers.keys.toList().last;
+        _markers.remove(lastMarkerKey);
+        _points.removeLast();
+        _calculateAndDrawRoute();
       });
-
-      _points.clear();
     }
   }
 }

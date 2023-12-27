@@ -1,18 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/repository/event_repository.dart';
 
-import '../utils/color_utils.dart';
-import '../widgets/widget.dart';
-import 'map/map_screen.dart';
+import '../../../utils/color_utils.dart';
+import '../../../widgets/widget.dart';
+import '../map/map_screen.dart';
+import 'add_event_screen.dart';
 
-class AddEventScreen extends StatefulWidget {
-  const AddEventScreen({Key? key}) : super(key: key);
-
-  @override
-  _AddEventScreenState createState() => _AddEventScreenState();
-}
-
-class _AddEventScreenState extends State<AddEventScreen> {
+class AddEventView extends State<AddEventScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
   late TextEditingController _dateStartTextController;
@@ -25,6 +21,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
   late DateTime _selectedEndDate = DateTime.now();
   late TimeOfDay _selectedEndTime = TimeOfDay.now();
   final eventRepository = EventRepository();
+
+  List<LatLng> _points = [];
 
   @override
   void initState() {
@@ -42,8 +40,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
     _maxParticipantsController = TextEditingController();
   }
 
-  Future<void> _selectDate(
-      BuildContext context, TextEditingController date, DateTime selectedDate) async {
+  Future<void> _selectDate(BuildContext context, TextEditingController date,
+      DateTime selectedDate) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
@@ -59,8 +57,8 @@ class _AddEventScreenState extends State<AddEventScreen> {
     }
   }
 
-  Future<void> _selectTime(
-      BuildContext context, TextEditingController time, TimeOfDay selectedTime) async {
+  Future<void> _selectTime(BuildContext context, TextEditingController time,
+      TimeOfDay selectedTime) async {
     TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: selectedTime,
@@ -129,8 +127,14 @@ class _AddEventScreenState extends State<AddEventScreen> {
         child: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.05,
-              vertical: MediaQuery.of(context).size.height * 0.02,
+              horizontal: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.05,
+              vertical: MediaQuery
+                  .of(context)
+                  .size
+                  .height * 0.02,
             ),
             child: Column(
               children: [
@@ -219,19 +223,24 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                const Text("Początek wydarzenia:", style: TextStyle(color: Colors.white)),
+                const Text("Początek wydarzenia:",
+                    style: TextStyle(color: Colors.white)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
                       onPressed: () =>
-                          _selectDate(context, _dateStartTextController, _selectedStartDate),
-                      child: const Text('Wybierz datę', style: TextStyle(color: Colors.blue)),
+                          _selectDate(context, _dateStartTextController,
+                              _selectedStartDate),
+                      child: const Text(
+                          'Wybierz datę', style: TextStyle(color: Colors.blue)),
                     ),
                     ElevatedButton(
                       onPressed: () =>
-                          _selectTime(context, _timeStartTextController, _selectedStartTime),
-                      child: const Text('Wybierz godzinę', style: TextStyle(color: Colors.blue)),
+                          _selectTime(context, _timeStartTextController,
+                              _selectedStartTime),
+                      child: const Text('Wybierz godzinę',
+                          style: TextStyle(color: Colors.blue)),
                     ),
                   ],
                 ),
@@ -254,20 +263,25 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   ],
                 ),
                 const SizedBox(height: 16.0),
-                const Text("Koniec wydarzenia:", style: TextStyle(color: Colors.white)),
+                const Text("Koniec wydarzenia:",
+                    style: TextStyle(color: Colors.white)),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
                       onPressed: () =>
-                          _selectDate(context, _dateEndTextController, _selectedEndDate),
-                      child: const Text('Wybierz datę', style: TextStyle(color: Colors.blue)),
+                          _selectDate(context, _dateEndTextController,
+                              _selectedEndDate),
+                      child: const Text(
+                          'Wybierz datę', style: TextStyle(color: Colors.blue)),
                     ),
                     ElevatedButton(
                       onPressed: () =>
-                          _selectTime(context, _timeEndTextController, _selectedEndTime),
-                      child: const Text('Wybierz godzinę', style: TextStyle(color: Colors.blue)),
+                          _selectTime(context, _timeEndTextController,
+                              _selectedEndTime),
+                      child: const Text('Wybierz godzinę',
+                          style: TextStyle(color: Colors.blue)),
                     ),
                   ],
                 ),
@@ -294,14 +308,23 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () =>
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => MapScreen())),
-                      child: const Text('Wybierz trasę', style: TextStyle(color: Colors.blue)),
+                      onPressed: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MapScreen(addEventView: this),
+                          ),
+                        );
+                      },
+                      child: const Text('Wybierz trasę',
+                          style: TextStyle(color: Colors.blue)),
                     ),
                     const SizedBox(width: 16.0),
                     ElevatedButton(
                       onPressed: () => showFriends(),
-                      child: const Text('Zaproś znajomych', style: TextStyle(color: Colors.blue)),
+                      child: const Text('Zaproś znajomych',
+                          style: TextStyle(color: Colors.blue)),
                     ),
                   ],
                 )
@@ -312,7 +335,6 @@ class _AddEventScreenState extends State<AddEventScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-
           if (_titleController.text.isEmpty ||
               _dateStartTextController.text.isEmpty ||
               _timeStartTextController.text.isEmpty ||
@@ -342,7 +364,14 @@ class _AddEventScreenState extends State<AddEventScreen> {
               _selectedEndTime.minute,
             );
 
-            eventRepository.createEvent(_titleController.text, _descriptionController.text, selectedStartDateTime, selectedEndDateTime, int.parse(_maxParticipantsController.text));
+            List<GeoPoint> geoPoints = _points.map((latLng) {
+              return GeoPoint(latLng.latitude, latLng.longitude);
+            }).toList();
+
+            eventRepository.createEvent(
+                _titleController.text, _descriptionController.text,
+                selectedStartDateTime, selectedEndDateTime,
+                int.parse(_maxParticipantsController.text), geoPoints);
 
             Navigator.pop(context);
           }
@@ -352,6 +381,14 @@ class _AddEventScreenState extends State<AddEventScreen> {
         child: const Icon(Icons.check),
       ),
     );
+  }
+
+  void setPoints(List<LatLng> points) {
+    setState(() {
+      _points = points;
+    });
+
+    createSnackBar('Trasa została zapisana.', context);
   }
 
   showFriends() {

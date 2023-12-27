@@ -14,7 +14,7 @@ class EventRepository {
     return user?.uid;
   }
 
-  Future<void> createEvent(String title, String description, DateTime startDate, DateTime endDate, int capacity) async {
+  Future<void> createEvent(String title, String description, DateTime startDate, DateTime endDate, int capacity, List<GeoPoint> geoPoints) async {
     String? ownerId = await getCurrentUserId();
 
     if (ownerId != null) {
@@ -31,6 +31,7 @@ class EventRepository {
           endDate: endDate,
           capacity: capacity,
           participants: 1,
+          route: geoPoints,
         );
 
         await _db.collection('events').doc().set(event.toJson());

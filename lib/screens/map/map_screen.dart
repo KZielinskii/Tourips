@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../add_event/add_event_view.dart';
+
+
 const LatLng startPosition = LatLng(52, 20);
 const Duration updateInterval = Duration(seconds: 10);
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  final AddEventView addEventView;
+
+  const MapScreen({super.key, required this.addEventView});
 
   @override
   _MapScreenState createState() => _MapScreenState();
@@ -60,9 +65,22 @@ class _MapScreenState extends State<MapScreen> {
               onPressed: () {
                 _removeLastPoint();
               },
+              heroTag: 'removeButtonHeroTag',
               backgroundColor: Colors.red,
               icon: const Icon(Icons.remove),
               label: const Text('Usuń'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                _saveRoute();
+              },
+              heroTag: 'saveButtonHeroTag',
+              backgroundColor: Colors.green,
+              icon: const Icon(Icons.save),
+              label: const Text('Zapisz'),
             ),
           ),
         ],
@@ -172,6 +190,9 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-
+  void _saveRoute() async {
+    widget.addEventView.setPoints(_points);
+    Navigator.pop(context);
+  }
 }
 

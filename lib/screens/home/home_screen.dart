@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tourpis/screens/add_event_screen.dart';
 import 'package:tourpis/screens/home/home_events_page.dart';
 import 'package:tourpis/screens/home/home_recommended_page.dart';
 import '../../utils/color_utils.dart';
+import '../add_event/add_event_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);

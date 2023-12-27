@@ -44,6 +44,7 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
         ? TextInputType.visiblePassword
         : TextInputType.emailAddress,
   );
+
 }
 
 Container singInButton(BuildContext context, bool isLogin, Function onTab) {
@@ -71,5 +72,26 @@ Container singInButton(BuildContext context, bool isLogin, Function onTab) {
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30))))),
+  );
+}
+
+void createSnackBar(String text, BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      duration: const Duration(seconds: 2),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.lightBlueAccent,
+    ),
   );
 }

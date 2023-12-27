@@ -98,6 +98,27 @@ void createSnackBar(String text, BuildContext context) {
   );
 }
 
+void createSnackBarError(String text, BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      duration: const Duration(seconds: 5),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
+
 Container iconButton(IconData icon, bool done) {
     if(done) {
       return Container(

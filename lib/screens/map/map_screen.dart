@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tourpis/widgets/widget.dart';
 
 import '../add_event/add_event_view.dart';
 
@@ -191,8 +192,15 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _saveRoute() async {
-    widget.addEventView.setPoints(_points);
-    Navigator.pop(context);
+    if(_points.isEmpty) {
+      createSnackBarError('Nie wybrano żandego punktu!', context);
+    }
+    else {
+      widget.addEventView.doneMap = true;
+      widget.addEventView.setPoints(_points);
+      Navigator.pop(context);
+    }
+
   }
 }
 

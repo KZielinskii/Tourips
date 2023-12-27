@@ -5,6 +5,7 @@ import 'package:tourpis/repository/event_repository.dart';
 
 import '../../../utils/color_utils.dart';
 import '../../../widgets/widget.dart';
+import '../friends/add_event_friends_screen.dart';
 import '../map/map_screen.dart';
 import 'add_event_screen.dart';
 
@@ -24,6 +25,9 @@ class AddEventView extends State<AddEventScreen> {
 
   List<LatLng> _points = [];
 
+  bool doneMap = false;
+  bool doneFriends = false;
+
   @override
   void initState() {
     super.initState();
@@ -40,64 +44,64 @@ class AddEventView extends State<AddEventScreen> {
     _maxParticipantsController = TextEditingController();
   }
 
-  Future<void> _selectDate(BuildContext context, TextEditingController date,
-      DateTime selectedDate) async {
+  Future<void> _selectStartDateAndTime(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: _selectedStartDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
 
-    if (pickedDate != null && pickedDate != selectedDate) {
+    if (pickedDate != null && pickedDate != _selectedStartDate) {
       setState(() {
-        selectedDate = pickedDate;
-        date.text = "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+        _selectedStartDate = pickedDate;
+        _dateStartTextController.text =
+            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
+
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: _selectedStartTime,
+      );
+
+      if (pickedTime != null && pickedTime != _selectedStartTime) {
+        setState(() {
+          _selectedStartTime = pickedTime;
+          _timeStartTextController.text =
+              "${pickedTime.hour}:${pickedTime.minute}";
+        });
+      }
     }
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController time,
-      TimeOfDay selectedTime) async {
-    TimeOfDay? pickedTime = await showTimePicker(
+  Future<void> _selectEndDateAndTime(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialTime: selectedTime,
+      initialDate: _selectedEndDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
     );
 
-    if (pickedTime != null && pickedTime != selectedTime) {
+    if (pickedDate != null && pickedDate != _selectedEndDate) {
       setState(() {
-        selectedTime = pickedTime;
-        time.text = "${pickedTime.hour}:${pickedTime.minute}";
+        _selectedEndDate = pickedDate;
+        _dateEndTextController.text =
+            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
-    }
-  }
 
-  Widget _buildDisabledTextField({
-    required TextEditingController controller,
-    required String labelText,
-  }) {
-    return TextFormField(
-      controller: controller,
-      enabled: false,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle: const TextStyle(color: Colors.white),
-        contentPadding: const EdgeInsets.all(16.0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(color: Colors.white),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.blue),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-    );
+      TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: _selectedEndTime,
+      );
+
+      if (pickedTime != null && pickedTime != _selectedEndTime) {
+        setState(() {
+          _selectedEndTime = pickedTime;
+          _timeEndTextController.text =
+              "${pickedTime.hour}:${pickedTime.minute}";
+        });
+      }
+    }
   }
 
   @override
@@ -126,15 +130,11 @@ class AddEventView extends State<AddEventScreen> {
         ),
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.05,
-              vertical: MediaQuery
-                  .of(context)
-                  .size
-                  .height * 0.02,
+            padding: EdgeInsets.fromLTRB(
+                MediaQuery.of(context).size.width * 0.1,
+                MediaQuery.of(context).size.height * 0.1,
+                MediaQuery.of(context).size.width * 0.1,
+                MediaQuery.of(context).size.height * 0.4
             ),
             child: Column(
               children: [
@@ -165,7 +165,7 @@ class AddEventView extends State<AddEventScreen> {
                 TextFormField(
                   controller: _descriptionController,
                   style: const TextStyle(color: Colors.white),
-                  maxLines: 3,
+                  maxLines: 5,
                   decoration: InputDecoration(
                     labelText: 'Opis',
                     labelStyle: const TextStyle(color: Colors.white),
@@ -223,108 +223,95 @@ class AddEventView extends State<AddEventScreen> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                const Text("Początek wydarzenia:",
-                    style: TextStyle(color: Colors.white)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () =>
-                          _selectDate(context, _dateStartTextController,
-                              _selectedStartDate),
-                      child: const Text(
-                          'Wybierz datę', style: TextStyle(color: Colors.blue)),
+                ElevatedButton(
+                  onPressed: () => _selectStartDateAndTime(context),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                    const Icon(Icons.calendar_today, color: Colors.blue),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      _dateStartTextController.text.isNotEmpty
+                          ? '${_dateStartTextController.text} ${_timeStartTextController.text}'
+                          : 'Wybierz datę rozpoczęcia.',
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                      ),
                     ),
-                    ElevatedButton(
-                      onPressed: () =>
-                          _selectTime(context, _timeStartTextController,
-                              _selectedStartTime),
-                      child: const Text('Wybierz godzinę',
-                          style: TextStyle(color: Colors.blue)),
-                    ),
-                  ],
+                  ]),
+                ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () => _selectEndDateAndTime(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.calendar_today, color: Colors.blue),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        _dateEndTextController.text.isNotEmpty
+                            ? '${_dateEndTextController.text} ${_timeEndTextController.text}'
+                            : 'Wybierz datę zakończenia.',
+                        style: const TextStyle(
+                            color: Colors.blue,
+                            fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16.0),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: _buildDisabledTextField(
-                        controller: _dateStartTextController,
-                        labelText: 'Data',
+                    InkWell(
+                      onTap: () async {
+                        setState(() {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapScreen(
+                                addEventView: this,
+                              ),
+                            ),
+                          );
+                        });
+                      },
+                      child: Column(
+                        children: [
+                          iconButton(Icons.map, doneMap),
+                          const SizedBox(height: 8.0),
+                          const Text(
+                            'Mapa',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 16.0),
-                    Expanded(
-                      child: _buildDisabledTextField(
-                        controller: _timeStartTextController,
-                        labelText: 'Godzina',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-                const Text("Koniec wydarzenia:",
-                    style: TextStyle(color: Colors.white)),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () =>
-                          _selectDate(context, _dateEndTextController,
-                              _selectedEndDate),
-                      child: const Text(
-                          'Wybierz datę', style: TextStyle(color: Colors.blue)),
-                    ),
-                    ElevatedButton(
-                      onPressed: () =>
-                          _selectTime(context, _timeEndTextController,
-                              _selectedEndTime),
-                      child: const Text('Wybierz godzinę',
-                          style: TextStyle(color: Colors.blue)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildDisabledTextField(
-                        controller: _dateEndTextController,
-                        labelText: 'Data',
-                      ),
-                    ),
-                    const SizedBox(width: 16.0),
-                    Expanded(
-                      child: _buildDisabledTextField(
-                        controller: _timeEndTextController,
-                        labelText: 'Godzina',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
+                    InkWell(
+                      onTap: () async {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                MapScreen(addEventView: this),
+                            builder: (context) => AddEventFriendsListScreen(),
                           ),
                         );
+                        setState(() {
+                          doneFriends = true;
+                        });
                       },
-                      child: const Text('Wybierz trasę',
-                          style: TextStyle(color: Colors.blue)),
-                    ),
-                    const SizedBox(width: 16.0),
-                    ElevatedButton(
-                      onPressed: () => showFriends(),
-                      child: const Text('Zaproś znajomych',
-                          style: TextStyle(color: Colors.blue)),
+                      child: Column(
+                        children: [
+                          iconButton(Icons.person_add_alt_rounded, doneFriends),
+                          const SizedBox(height: 8.0),
+                          const Text(
+                            'Zaproś',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 )
@@ -337,16 +324,11 @@ class AddEventView extends State<AddEventScreen> {
         onPressed: () async {
           if (_titleController.text.isEmpty ||
               _dateStartTextController.text.isEmpty ||
-              _timeStartTextController.text.isEmpty ||
               _dateEndTextController.text.isEmpty ||
-              _timeEndTextController.text.isEmpty ||
-              _maxParticipantsController.text.isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Nie wypełniono wszystkich wymaganych pól.'),
-                backgroundColor: Colors.red,
-              ),
-            );
+              _maxParticipantsController.text.isEmpty ||
+              doneMap == false) {
+            createSnackBarError(
+                'Nie wypełniono wszystkich wymaganych pól.', context);
           } else {
             DateTime selectedStartDateTime = DateTime(
               _selectedStartDate.year,
@@ -364,14 +346,24 @@ class AddEventView extends State<AddEventScreen> {
               _selectedEndTime.minute,
             );
 
+            if (selectedEndDateTime.isBefore(selectedStartDateTime)) {
+              createSnackBarError(
+                  'Data zakończenia musi być późniejsza\nniż data rozpoczęcia.',
+                  context);
+              return;
+            }
+
             List<GeoPoint> geoPoints = _points.map((latLng) {
               return GeoPoint(latLng.latitude, latLng.longitude);
             }).toList();
 
             eventRepository.createEvent(
-                _titleController.text, _descriptionController.text,
-                selectedStartDateTime, selectedEndDateTime,
-                int.parse(_maxParticipantsController.text), geoPoints);
+                _titleController.text,
+                _descriptionController.text,
+                selectedStartDateTime,
+                selectedEndDateTime,
+                int.parse(_maxParticipantsController.text),
+                geoPoints);
 
             Navigator.pop(context);
           }
@@ -389,9 +381,5 @@ class AddEventView extends State<AddEventScreen> {
     });
 
     createSnackBar('Trasa została zapisana.', context);
-  }
-
-  showFriends() {
-    //todo
   }
 }

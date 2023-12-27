@@ -40,6 +40,7 @@ class HomeRecommendedPage extends StatelessWidget {
                 endDate: (data['endDate'] as Timestamp).toDate(),
                 capacity: data['capacity'],
                 participants: data['participants'],
+                route: data['route'],
               );
             }).toList();
 

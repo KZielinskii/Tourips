@@ -30,35 +30,49 @@ class HomeEventsPage extends StatelessWidget {
           } else if (snapshot.hasError) {
             return Text('Wystąpił błąd: ${snapshot.error}');
           } else {
-            List<EventModel> events = snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-              return EventModel(
-                title: data['title'],
-                description: data['description'],
-                owner: data['owner'],
-                startDate: (data['startDate'] as Timestamp).toDate(),
-                endDate: (data['endDate'] as Timestamp).toDate(),
-                capacity: data['capacity'],
-                participants: data['participants'],
-              );
-            }).toList();
+            try {
+              List<EventModel> events = snapshot.data!.docs.map((
+                  DocumentSnapshot document) {
+                Map<String, dynamic> data = document.data() as Map<
+                    String,
+                    dynamic>;
+                List<GeoPoint> route = data['route'] != null &&
+                    data['route'] is List
+                    ? (data['route'] as List).cast<GeoPoint>()
+                    : [];
 
-            return Column(
-              children: [
-                if (events.isEmpty)
-                  const Center(child: Text('Nie znaleziono wydarzeń'))
-                else
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: events.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () => goToEventDetails(context),
-                        child: EventCard(event: events.elementAt(index)),
+                return EventModel(
+                  title: data['title'],
+                  description: data['description'],
+                  owner: data['owner'],
+                  startDate: (data['startDate'] as Timestamp).toDate(),
+                  endDate: (data['endDate'] as Timestamp).toDate(),
+                  capacity: data['capacity'],
+                  participants: data['participants'],
+                  route: route,
+                );
+              }).toList();
+
+              return Column(
+                children: [
+                  if (events.isEmpty)
+                    const Center(child: Text('Nie znaleziono wydarzeń'))
+                  else
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: events.length,
+                        itemBuilder: (context, index) =>
+                            GestureDetector(
+                              onTap: () => goToEventDetails(context),
+                              child: EventCard(event: events.elementAt(index)),
+                            ),
                       ),
                     ),
-                  ),
-              ],
-            );
+                ],
+              );
+            } catch (error) {
+              return Text('Wystąpił błąd podczas przetwarzania danych: $error');
+            }
           }
         },
       ),

@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore_platform_interface/src/geo_point.dart';
 
 class EventModel {

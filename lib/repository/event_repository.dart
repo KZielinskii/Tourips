@@ -6,16 +6,10 @@ import '../models/UserModel.dart';
 
 class EventRepository {
   final _db = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
   final userRepository = UserRepository();
 
-  Future<String?> getCurrentUserId() async {
-    User? user = _auth.currentUser;
-    return user?.uid;
-  }
-
   Future<void> createEvent(String title, String description, DateTime startDate, DateTime endDate, int capacity, List<GeoPoint> geoPoints) async {
-    String? ownerId = await getCurrentUserId();
+    String? ownerId = await userRepository.getCurrentUserId();
 
     if (ownerId != null) {
       UserModel? owner = await userRepository.getUserByUid(ownerId);

@@ -1,9 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/UserModel.dart';
 
 class UserRepository {
   final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  Future<String?> getCurrentUserId() async {
+    User? user = _auth.currentUser;
+    return user?.uid;
+  }
 
   Future<bool> checkIfLoginExists(String login) async {
     QuerySnapshot querySnapshot = await _db
@@ -28,7 +35,6 @@ class UserRepository {
 
     if (querySnapshot.docs.isNotEmpty) {
       UserModel user = UserModel.fromJson(querySnapshot.docs.first.data() as Map<String, dynamic>);
-      print('Znaleziono użytkownika: ${user.login}');
       return user;
     } else {
       print('Nie znaleziono użytkownika o podanym UID');

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screens/friends/add_event_friends_screen.dart';
+
 Image logoWidget(String name) {
   return Image.asset(
     name,
@@ -94,4 +96,50 @@ void createSnackBar(String text, BuildContext context) {
       backgroundColor: Colors.lightBlueAccent,
     ),
   );
+}
+
+Container iconButton(IconData icon, bool done) {
+    if(done) {
+      return Container(
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.blueGrey,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          size: 36.0,
+          color: Colors.blue,
+        ),
+    );
+  } else {
+      return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Icon(
+        icon,
+        size: 36.0,
+        color: Colors.blue,
+      ),
+    );
+  }
 }

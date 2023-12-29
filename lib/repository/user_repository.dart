@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -21,9 +23,9 @@ class UserRepository {
     return querySnapshot.docs.isNotEmpty;
   }
 
-  Future<void> createUser(String login, String email, String uid) async {
+  Future<void> createUser(String login, String email, String uid, String profileImageUrl) async {
 
-    UserModel user = UserModel(login: login, email: email, uid: uid);
+    UserModel user = UserModel(login: login, email: email, uid: uid, profileImageUrl: profileImageUrl);
     await _db.collection('users').doc().set(user.toJson());
   }
 

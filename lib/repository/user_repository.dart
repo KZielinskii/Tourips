@@ -23,7 +23,7 @@ class UserRepository {
 
   Future<void> createUser(String login, String email, String uid) async {
 
-    UserModel user = UserModel(login: login, email: email, uid: uid);
+    UserModel user = UserModel(login: login, email: email, uid: uid, profileImageUrl: "");
     await _db.collection('users').doc().set(user.toJson());
   }
 
@@ -40,5 +40,13 @@ class UserRepository {
       print('Nie znaleziono użytkownika o podanym UID');
     }
     return null;
+  }
+
+  Future<void> updateUserProfileImage(String userId, String imageUrl) async {
+    print(imageUrl);
+    print("******************");
+    await _db.collection('users').doc(userId).update({
+      'profileImageUrl': imageUrl,
+    });
   }
 }

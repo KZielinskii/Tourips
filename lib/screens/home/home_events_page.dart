@@ -5,7 +5,7 @@ import 'package:tourpis/models/EventModel.dart';
 import 'event_card.dart';
 
 class HomeEventsPage extends StatelessWidget {
-  const HomeEventsPage({Key? key}) : super(key: key);
+  const HomeEventsPage({super.key});
 
   void goToEventDetails(BuildContext context) {
     //todo
@@ -26,7 +26,7 @@ class HomeEventsPage extends StatelessWidget {
         stream: FirebaseFirestore.instance.collection('events').snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Text('Wystąpił błąd: ${snapshot.error}');
           } else {

@@ -3,6 +3,7 @@ import 'package:tourpis/screens/home/home_events_page.dart';
 import 'package:tourpis/screens/home/home_recommended_page.dart';
 import '../../utils/color_utils.dart';
 import '../add_event/add_event_screen.dart';
+import '../profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -63,8 +64,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 10), // Spacer
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 25.0,
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.black,
+                        size: 40.0,
+                      ),
+                    ),
                   ),
                 ],
               ),

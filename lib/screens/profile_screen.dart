@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -104,12 +103,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         shape: BoxShape.circle,
                         color: Colors.white,
                       ),
-                      child: const Center(
+                      child: _image == null
+                          ? const Center(
                         child: Icon(
-                          Icons.photo,
-                          color: Colors.white,
+                          Icons.person,
+                          color: Colors.blueGrey,
+                          size: 128,
                         ),
-                      ),
+                      )
+                          : null,
                     ),
                   ),
                   if (_image != null)

@@ -72,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         .then((UserCredential userCredential) {
                       String uid = userCredential.user!.uid;
                       userRepository.createUser(_loginTextController.text,
-                          _emailTextController.text, uid);
+                          _emailTextController.text, uid, "");
 
                       print("Created New Account");
                       Navigator.push(

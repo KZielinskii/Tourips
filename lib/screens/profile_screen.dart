@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,9 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tourpis/screens/signin_screen.dart';
-import '../repository/user_repository.dart';
 import '../utils/color_utils.dart';
-
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -18,7 +17,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File? _image;
-  String? _imageUrl;
+  late User user;
 
   @override
   void initState() {
@@ -26,56 +25,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserProfileImage();
   }
 
-  static Future<String> uploadImage(File imageFile, String userId) async {
-    final storageRef = FirebaseStorage.instance.ref().child('profile_images/$userId.jpg');
-    //todo error
-    await storageRef.putFile(imageFile);
-    final downloadUrl = await storageRef.getDownloadURL();
-    return downloadUrl;
-  }
-
-  static Future<void> deleteImage(String imageUrl) async {
-    final storageRef = FirebaseStorage.instance.refFromURL(imageUrl);
-    await storageRef.delete();
-  }
-
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    late File imagePath;
 
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user != null) {
-        try {
-
-          final imageUrl = await uploadImage(_image!, user.uid);
-
-          await UserRepository().updateUserProfileImage(user.uid, imageUrl);
-
-        } catch (e) {
-          print("Wystąpił błąd podczas przesyłania obrazu do Firebase Storage: $e");
-        }
-      }
+      imagePath = File(pickedFile.path);
     }
+
+    Reference storageReference =
+    FirebaseStorage.instance.ref().child('images/${user.uid}.png');
+
+    UploadTask uploadTask = storageReference.putFile(imagePath);
+    await uploadTask.whenComplete(() {
+      print('Image uploaded');
+      _loadUserProfileImage();
+    });
   }
 
   Future<void> _loadUserProfileImage() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        final userData = await UserRepository().getUserByUid(user.uid);
-        if (userData != null) {
-          setState(() {
-            _imageUrl = userData.profileImageUrl;
-          });
-        }
-      } catch (e) {
-        print("Wystąpił błąd podczas wczytywania obrazu profilowego: $e");
-      }
+    setState(() {
+      user = FirebaseAuth.instance.currentUser!;
+    });
+
+    Reference storageReference =
+    FirebaseStorage.instance.ref().child('images/${user.uid}.png');
+
+    try {
+      _image = File((await storageReference.getDownloadURL()).toString());
+
+      setState(() {
+        _image = _image;
+      });
+    } catch (e) {
+      print('Error loading image: $e');
     }
   }
 
@@ -133,8 +116,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     GestureDetector(
                       onTap: _pickImage,
                       child: ClipOval(
-                        child: Image.file(
-                          _image!,
+                        child: Image.network(
+                          _image!.path,
                           height: 128,
                           width: 128,
                         ),

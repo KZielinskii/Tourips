@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             colors: [
               hexStringToColor("2F73B1"),
               hexStringToColor("2F73B1"),
-              hexStringToColor("DCDCDC"),
+              hexStringToColor("0B3963"),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -134,7 +134,13 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
+        backgroundColor: Colors.white,
+        elevation: 5,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+        showUnselectedLabels: true,
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

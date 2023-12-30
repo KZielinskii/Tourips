@@ -91,7 +91,7 @@ void createSnackBar(String text, BuildContext context) {
           ),
         ],
       ),
-      backgroundColor: Colors.lightBlueAccent,
+      backgroundColor: Colors.lightGreenAccent,
     ),
   );
 }

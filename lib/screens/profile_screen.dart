@@ -197,7 +197,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(_isEditingLogin ? Icons.save : Icons.edit),
+                      icon: Icon(
+                        _isEditingLogin ? Icons.save : Icons.edit,
+                        color: Colors.white,
+                      ),
                       onPressed: () {
                         if (_isEditingLogin) {
                           _saveNewLogin();
@@ -205,6 +208,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _toggleEditingLogin();
                         }
                       },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(const Color(0x55FFFFFF)),
+                      ),
                     ),
                   ],
                 ),

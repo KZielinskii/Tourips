@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/user_repository.dart';
@@ -22,9 +25,6 @@ class UsersScreenState extends State<UsersScreen> {
     setState(() {
       _usersList = allUsers;
     });
-    for(var user in allUsers) {
-
-    }
   }
 
   @override

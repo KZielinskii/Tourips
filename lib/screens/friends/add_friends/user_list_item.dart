@@ -17,12 +17,11 @@ class UserListItem extends StatelessWidget {
 
     try {
       String downloadURL = await storageReference.getDownloadURL();
-      //todo wyświetlanie zdjęcia
       File imageFile = File(downloadURL);
       return imageFile;
     } catch (e) {
-      print('Error loading image: $e');
-      return File("assets/images/logo.png");
+      print('Error loading image.');
+      return null;
     }
   }
 
@@ -35,7 +34,7 @@ class UserListItem extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data != null) {
           return ListItemView(
-            image: FileImage(snapshot.data!),
+            image: NetworkImage(snapshot.data!.path),
             buttonText: "Dodaj znajomego",
             onPressed: () {
               //todo Dodaj logikę dodawania znajomego
@@ -43,7 +42,7 @@ class UserListItem extends StatelessWidget {
           );
         } else {
           return ListItemView(
-            image: const AssetImage("assets/images/logo.png"),
+            image: const AssetImage("assets/images/no_image.png"),
             buttonText: "Dodaj znajomego",
             onPressed: () {
               //todo Dodaj logikę dodawania znajomego

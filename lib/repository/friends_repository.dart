@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourpis/repository/user_repository.dart';
 
 import '../models/FriendsModel.dart';
+import '../models/UserModel.dart';
 
 class FriendsRepository {
   final _db = FirebaseFirestore.instance;
@@ -42,5 +43,22 @@ class FriendsRepository {
     } catch (e) {
       print("Błąd podczas usuwania znajomego: $e");
     }
+  }
+
+  Future<List<UserModel>> loadFriendsList() async {
+    FriendsModel? friendsModel = await getFriendsList();
+    List<UserModel> friendsList = [];
+
+    if (friendsModel != null) {
+      for (String? friendId in friendsModel.friends) {
+        if (friendId != null) {
+          UserModel? friend = await UserRepository().getUserByUid(friendId);
+          if (friend != null) {
+            friendsList.add(friend);
+          }
+        }
+      }
+    }
+    return friendsList;
   }
 }

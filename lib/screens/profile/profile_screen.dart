@@ -7,11 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/screens/signin_screen.dart';
-import '../models/FriendsModel.dart';
-import '../repository/friends_repository.dart';
-import '../utils/color_utils.dart';
-import '../widgets/widget.dart';
-import 'friends/add_friends/users_screen.dart';
+import '../../repository/friends_repository.dart';
+import '../../utils/color_utils.dart';
+import '../../widgets/drawer_widget.dart';
+import '../../widgets/widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -212,86 +211,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Twój profil"),
-          backgroundColor: hexStringToColor("2F73B1"),
+          backgroundColor: hexStringToColor("0B3963"),
           titleTextStyle: const TextStyle(
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        drawer: Drawer(
-          backgroundColor: Colors.white,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: hexStringToColor("2F73B1"),
-                ),
-                child: const Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Lista znajomych',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.person_add),
-                title: const Text('Dodaj znajomych'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const UsersScreen()),
-                  );
-                },
-              ),
-              for (UserModel friend in _friendsList)
-                ListTile(
-                  title: Text(friend.login ?? ""),
-                  onTap: () {
-                    //todo
-                    Navigator.pop(context);
-                  },
-                ),
-              ListTile(
-                title: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: 'Wyszukaj znajomych...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: Colors.lightBlueAccent,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                    ),
-                    onChanged: (value) {
-                      //todo
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        drawer: buildDrawer(context, []),
         body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(colors: [

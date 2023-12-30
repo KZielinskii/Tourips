@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tourpis/screens/signin_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:tourpis/utils/custom_theme.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -25,11 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: CustomTheme.of(context),
       home: const SignInScreen(),
     );
   }

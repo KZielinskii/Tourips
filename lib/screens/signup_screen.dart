@@ -31,7 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             gradient: LinearGradient(colors: [
           hexStringToColor("2F73B1"),
           hexStringToColor("2F73B1"),
-          hexStringToColor("DCDCDC")
+          hexStringToColor("0B3963")
         ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: SingleChildScrollView(
           child: Padding(
@@ -44,22 +44,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
               children: <Widget>[
                 logoWidget("assets/images/logo_text.png"),
                 reusableTextField("Wprowadź login", Icons.person_outline, false,
-                    _loginTextController),
+                    _loginTextController, true),
                 const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Wprowadź email", Icons.person_outline, false,
-                    _emailTextController),
+                    _emailTextController, true),
                 const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Wprowadź hasło", Icons.lock_outline, true,
-                    _passwordTextController),
+                    _passwordTextController, true),
                 const SizedBox(
                   height: 30,
                 ),
                 reusableTextField("Powtórz hasło", Icons.lock_outline, true,
-                    _passwordRepeatTextController),
+                    _passwordRepeatTextController, true),
                 const SizedBox(
                   height: 30,
                 ),
@@ -72,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         .then((UserCredential userCredential) {
                       String uid = userCredential.user!.uid;
                       userRepository.createUser(_loginTextController.text,
-                          _emailTextController.text, uid, "");
+                          _emailTextController.text, uid);
 
                       print("Created New Account");
                       Navigator.push(

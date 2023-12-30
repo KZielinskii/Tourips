@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../screens/friends/add_event_friends_screen.dart';
-
 Image logoWidget(String name) {
   return Image.asset(
     name,
@@ -21,7 +19,7 @@ Image smallLogoWidget(String name) {
 }
 
 TextField reusableTextField(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller) {
+    TextEditingController controller, bool isEnabled) {
   return TextField(
     controller: controller,
     obscureText: isPasswordType,
@@ -45,8 +43,8 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     keyboardType: isPasswordType
         ? TextInputType.visiblePassword
         : TextInputType.emailAddress,
+    enabled: isEnabled,
   );
-
 }
 
 Container singInButton(BuildContext context, bool isLogin, Function onTab) {
@@ -93,7 +91,7 @@ void createSnackBar(String text, BuildContext context) {
           ),
         ],
       ),
-      backgroundColor: Colors.lightBlueAccent,
+      backgroundColor: Colors.lightGreenAccent,
     ),
   );
 }

@@ -26,7 +26,7 @@ class HomeRecommendedPage extends StatelessWidget {
         stream: FirebaseFirestore.instance.collection('events').snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Text('Wystąpił błąd: ${snapshot.error}');
           } else {

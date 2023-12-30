@@ -7,11 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/screens/signin_screen.dart';
-import '../models/FriendsModel.dart';
-import '../repository/friends_repository.dart';
-import '../utils/color_utils.dart';
-import '../widgets/widget.dart';
-import 'friends/add_friends/users_screen.dart';
+import '../../models/FriendsModel.dart';
+import '../../repository/friends_repository.dart';
+import '../../utils/color_utils.dart';
+import '../../widgets/widget.dart';
+import '../friends/add_friends/users_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -251,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.person_add),
-                title: const Text('Dodaj znajomych'),
+                title: const Text('Dodaj znajomych',),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(

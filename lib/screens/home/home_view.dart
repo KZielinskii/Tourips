@@ -3,9 +3,13 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:tourpis/models/UserModel.dart';
+import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 import 'package:tourpis/screens/home/home_events_page.dart';
 import 'package:tourpis/screens/home/home_recommended_page.dart';
-import '../../utils/color_utils.dart';
+import 'package:tourpis/utils/color_utils.dart';
+import 'package:tourpis/widgets/drawer_widget.dart';
+
 import '../add_event/add_event_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_screen.dart';
@@ -49,6 +53,16 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Wydarzenia"),
+        backgroundColor: hexStringToColor("0B3963"),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      drawer: buildDrawer(context, []),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -66,7 +80,7 @@ class HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.height * 0.1,
+                vertical: MediaQuery.of(context).size.height * 0.02,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -76,7 +90,7 @@ class HomeScreenState extends State<HomeScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       child: TextFormField(
                         decoration: const InputDecoration(

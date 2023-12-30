@@ -7,7 +7,7 @@ class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
 
   @override
-  UsersScreenState createState() => UsersScreenState();
+  UsersView createState() => UsersView();
 }
 
 

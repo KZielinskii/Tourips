@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
@@ -31,20 +30,15 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
                     fontSize: 24,
                   ),
                 ),
+                SizedBox(width: 8),
+                Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ],
             ),
           ),
-        ),
-        ListTile(
-          leading: const Icon(Icons.person_add),
-          title: const Text('Dodaj znajomych'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UsersScreen()),
-            );
-          },
         ),
         for (UserModel friend in friendsList)
           ListTile(
@@ -56,7 +50,6 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
           ),
         ListTile(
           title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
             child: TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
@@ -72,6 +65,39 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
               onChanged: (value) {
                 //todo
               },
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          child: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const UsersScreen()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: hexStringToColor("0B3963"),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    child: Icon(Icons.person_add, color: Colors.white),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Text(
+                      'Dodaj znajomych',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

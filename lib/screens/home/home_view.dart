@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:tourpis/models/UserModel.dart';
-import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 import 'package:tourpis/screens/home/home_events_page.dart';
 import 'package:tourpis/screens/home/home_recommended_page.dart';
 import 'package:tourpis/utils/color_utils.dart';

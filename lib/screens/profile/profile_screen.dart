@@ -7,12 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/screens/signin_screen.dart';
-import '../../models/FriendsModel.dart';
 import '../../repository/friends_repository.dart';
 import '../../utils/color_utils.dart';
 import '../../widgets/drawer_widget.dart';
 import '../../widgets/widget.dart';
-import '../friends/add_friends/users_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

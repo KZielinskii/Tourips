@@ -7,8 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/screens/signin_screen.dart';
+import '../models/FriendsModel.dart';
+import '../repository/friends_repository.dart';
 import '../utils/color_utils.dart';
 import '../widgets/widget.dart';
+import 'friends/add_friends/users_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -23,6 +26,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserModel? userModel;
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final FriendsRepository _friendsRepository = FriendsRepository();
+  late List<UserModel> _friendsList = [];
   bool _isEditingLogin = false;
 
   @override
@@ -30,6 +35,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _loadUserProfileImage();
     _loadUserData();
+    _loadFriendsList();
+  }
+
+  Future<void> _loadFriendsList() async {
+    _friendsList = await _friendsRepository.loadFriendsList();
+    setState(() {});
   }
 
   Future<void> _loadUserData() async {
@@ -159,30 +170,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () async {
                   Navigator.of(context).pop();
                 },
-                child: const Text("Anuluj", style: TextStyle(color: Colors.white),),
-
+                child: const Text(
+                  "Anuluj",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               TextButton(
                 onPressed: () async {
-                  if(correctPassword(newPasswordController.text, repeatNewPasswordController.text))
-                    {
-                      try {
-                        AuthCredential credential = EmailAuthProvider.credential(
-                          email: user.email!,
-                          password: currentPasswordController.text.toString(),
-                        );
-                        await user.reauthenticateWithCredential(credential);
-                        await user.updatePassword(newPasswordController.text.toString());
-                        createSnackBar('Hasło zaktualizowane.', context);
-                        Navigator.of(context).pop();
-                      } catch (error) {
-                        createSnackBarError(
-                            'Nie udało się zaktualizować hasła!', context);
-                      }
+                  if (correctPassword(newPasswordController.text,
+                      repeatNewPasswordController.text)) {
+                    try {
+                      AuthCredential credential = EmailAuthProvider.credential(
+                        email: user.email!,
+                        password: currentPasswordController.text.toString(),
+                      );
+                      await user.reauthenticateWithCredential(credential);
+                      await user.updatePassword(
+                          newPasswordController.text.toString());
+                      createSnackBar('Hasło zaktualizowane.', context);
+                      Navigator.of(context).pop();
+                    } catch (error) {
+                      createSnackBarError(
+                          'Nie udało się zaktualizować hasła!', context);
                     }
-
+                  }
                 },
-                child: const Text("Aktualizuj hasło", style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  "Aktualizuj hasło",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -201,6 +217,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
+          ),
+        ),
+        drawer: Drawer(
+          backgroundColor: Colors.white,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: hexStringToColor("2F73B1"),
+                ),
+                child: const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Lista znajomych',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.person_add),
+                title: const Text('Dodaj znajomych'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const UsersScreen()),
+                  );
+                },
+              ),
+              for (UserModel friend in _friendsList)
+                ListTile(
+                  title: Text(friend.login ?? ""),
+                  onTap: () {
+                    //todo
+                    Navigator.pop(context);
+                  },
+                ),
+              ListTile(
+                title: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: 'Wyszukaj znajomych...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Colors.lightBlueAccent,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    onChanged: (value) {
+                      //todo
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         body: Container(
@@ -320,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ));
   }
 
-  bool correctPassword(String password, String passwordRepeat){
+  bool correctPassword(String password, String passwordRepeat) {
     if (password != passwordRepeat) {
       createSnackBarError("Hasła nie są takie same.", context);
       return false;
@@ -330,11 +419,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return false;
     }
     if (!password.contains(RegExp(r'\d'))) {
-      createSnackBarError("Hasło musi zawierać co najmniej jedną liczbę.", context);
+      createSnackBarError(
+          "Hasło musi zawierać co najmniej jedną liczbę.", context);
       return false;
     }
     if (!password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-      createSnackBarError("Hasło musi zawierać co najmniej jeden\nznak specjalny.", context);
+      createSnackBarError(
+          "Hasło musi zawierać co najmniej jeden\nznak specjalny.", context);
       return false;
     }
     return true;

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/UserModel.dart';
+import 'friends_repository.dart';
 
 class UserRepository {
   final _db = FirebaseFirestore.instance;
@@ -72,4 +73,24 @@ class UserRepository {
       print('UserModel is null, unable to update login.');
     }
   }
+
+  Future<List<UserModel>> getAllUsersExceptFriends() async {
+    List<UserModel> allUsers = [];
+    List<UserModel> friendsList = await FriendsRepository().loadFriendsList();
+    String? currentUserId = await UserRepository().getCurrentUserId();
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .get();
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      UserModel user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
+      if (user.uid != currentUserId && !friendsList.contains(user)) {
+        allUsers.add(user);
+      }
+    }
+
+    return allUsers;
+  }
+
 }

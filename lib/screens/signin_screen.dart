@@ -41,11 +41,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(
                   height: 30,
                 ),
-                reusableTextField("Wprowadź email", Icons.person_outline, false, _emailTextController),
+                reusableTextField("Wprowadź email", Icons.person_outline, false, _emailTextController, true),
                 const SizedBox(
                   height: 30,
                 ),
-                reusableTextField("Wprowadź hasło", Icons.lock_outline, true, _passwordTextController),
+                reusableTextField("Wprowadź hasło", Icons.lock_outline, true, _passwordTextController, true),
                 const SizedBox(
                   height: 30,
                 ),

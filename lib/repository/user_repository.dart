@@ -23,9 +23,9 @@ class UserRepository {
     return querySnapshot.docs.isNotEmpty;
   }
 
-  Future<void> createUser(String login, String email, String uid, String profileImageUrl) async {
+  Future<void> createUser(String login, String email, String uid) async {
 
-    UserModel user = UserModel(login: login, email: email, uid: uid, profileImageUrl: profileImageUrl);
+    UserModel user = UserModel(login: login, email: email, uid: uid);
     await _db.collection('users').doc().set(user.toJson());
   }
 
@@ -42,5 +42,34 @@ class UserRepository {
       print('Nie znaleziono użytkownika o podanym UID');
     }
     return null;
+  }
+
+  Future<String?> getUserIdByUid(String uid) async {
+    QuerySnapshot querySnapshot = await _db
+        .collection('users')
+        .where('uid', isEqualTo: uid)
+        .limit(1)
+        .get();
+    return querySnapshot.docs.first.id;
+  }
+
+  Future<void> updateUserLogin(String uid, String newLogin) async {
+    bool loginExists = await checkIfLoginExists(newLogin);
+    if (loginExists) {
+      throw Exception('Podany login już istnieje. Wybierz inny.');
+    }
+
+    UserModel? userModel = await getUserByUid(uid);
+    if (userModel != null) {
+
+      String? id = await getUserIdByUid(uid);
+      await _db.collection('users').doc(id).update({'login': newLogin});
+      print('Update successful');
+
+      userModel = await getUserByUid(uid);
+      print('Updated Login: ${userModel?.login}');
+    } else {
+      print('UserModel is null, unable to update login.');
+    }
   }
 }

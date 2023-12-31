@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tourpis/screens/friends/add_friends/user_list_item.dart';
+import 'package:tourpis/screens/friends/add_friends/users/user_list_item.dart';
 
 import '../../../models/UserModel.dart';
 

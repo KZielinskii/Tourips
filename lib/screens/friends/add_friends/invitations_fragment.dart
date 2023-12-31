@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourpis/screens/friends/add_friends/request_list_item.dart';
+import 'package:tourpis/screens/friends/add_friends/requests/request_list_item.dart';
 
 import '../../../models/UserModel.dart';
 

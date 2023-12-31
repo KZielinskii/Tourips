@@ -8,19 +8,32 @@ import 'package:tourpis/screens/home/home_recommended_page.dart';
 import 'package:tourpis/utils/color_utils.dart';
 import 'package:tourpis/widgets/drawer_widget.dart';
 
+import '../../models/UserModel.dart';
+import '../../repository/friends_repository.dart';
 import '../add_event/add_event_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_screen.dart';
 
 class HomeScreenState extends State<HomeScreen> {
+
+  final FriendsRepository _friendsRepository = FriendsRepository();
+
+  late List<UserModel> _friendsList = [];
+  late User user;
+
   int _selectedIndex = 0;
   File? _image;
-  late User user;
 
   @override
   void initState() {
     super.initState();
     _loadUserProfileImage();
+    _loadFriendsList();
+  }
+
+  Future<void> _loadFriendsList() async {
+    _friendsList = await _friendsRepository.loadFriendsList();
+    setState(() {});
   }
 
   Future<void> _loadUserProfileImage() async {
@@ -60,7 +73,7 @@ class HomeScreenState extends State<HomeScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      drawer: buildDrawer(context, []),
+      drawer: buildDrawer(context, _friendsList),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(

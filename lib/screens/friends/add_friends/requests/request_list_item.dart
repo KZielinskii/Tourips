@@ -4,9 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
-import 'package:tourpis/screens/friends/add_friends/request_list_item_view.dart';
+import 'package:tourpis/repository/friends_repository.dart';
+import 'package:tourpis/screens/friends/add_friends/requests/request_list_item_view.dart';
 
-import '../../../models/UserModel.dart';
+import '../../../../models/UserModel.dart';
 
 class RequestListItem extends StatelessWidget {
   final UserModel user;
@@ -66,9 +67,9 @@ class RequestListItem extends StatelessWidget {
   }
 
   Future<void> acceptRequest(String askerId) async {
-    User currentUserId = FirebaseAuth.instance.currentUser!;
-    await friendRequestRepository.deleteRequestByAskerId(askerId, currentUserId.uid);
-    //dodaj do znajomych
+    User currentUser = FirebaseAuth.instance.currentUser!;
+    await friendRequestRepository.deleteRequestByAskerId(askerId, currentUser.uid);
+    await FriendsRepository().addFriend(askerId, currentUser.uid);
   }
 
   Future<void> deleteRequest(String askerId) async {

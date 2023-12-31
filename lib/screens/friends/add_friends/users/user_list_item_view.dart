@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../models/UserModel.dart';
+import '../../../../models/UserModel.dart';
 
 class UserListItemView extends StatelessWidget {
   final ImageProvider image;

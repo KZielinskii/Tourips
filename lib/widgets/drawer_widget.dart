@@ -40,14 +40,6 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
             ),
           ),
         ),
-        for (UserModel friend in friendsList)
-          ListTile(
-            title: Text(friend.login ?? ""),
-            onTap: () {
-              //todo
-              Navigator.pop(context);
-            },
-          ),
         ListTile(
           title: Container(
             child: TextField(
@@ -68,6 +60,14 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
             ),
           ),
         ),
+        for (UserModel friend in friendsList)
+          ListTile(
+            title: Text(friend.login ?? ""),
+            onTap: () {
+              //todo
+              Navigator.pop(context);
+            },
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           child: InkWell(

@@ -4,15 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
-import 'package:tourpis/screens/friends/add_friends/user_list_item_view.dart';
+import 'package:tourpis/screens/friends/add_friends/request_list_item_view.dart';
 
 import '../../../models/UserModel.dart';
 
-class UserListItem extends StatelessWidget {
+class RequestListItem extends StatelessWidget {
   final UserModel user;
   final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
 
-  UserListItem({super.key, required this.user});
+  RequestListItem({super.key, required this.user});
 
   Future<File?> _loadUserProfileImage(String userId) async {
     Reference storageReference =
@@ -36,19 +36,27 @@ class UserListItem extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data != null) {
-          return UserListItemView(
+          return RequestListItemView(
             image: NetworkImage(snapshot.data!.path),
-            buttonText: "Dodaj znajomego",
-            onPressed: () {
-              sendRequest(user.uid);
+            buttonFirstText: "Zaakceptuj",
+            buttonSecondText: "Odrzuć",
+            onPressedFirst: () {
+              acceptRequest(user.uid);
+            },
+            onPressedSecond: () {
+              deleteRequest(user.uid);
             }, user: user,
           );
         } else {
-          return UserListItemView(
+          return RequestListItemView(
             image: const AssetImage("assets/images/no_image.png"),
-            buttonText: "Dodaj znajomego",
-            onPressed: () {
-              sendRequest(user.uid);
+            buttonFirstText: "Zaakceptuj",
+            buttonSecondText: "Odrzuć",
+            onPressedFirst: () {
+              acceptRequest(user.uid);
+            },
+            onPressedSecond: () {
+              deleteRequest(user.uid);
             },
             user: user,
           );
@@ -57,8 +65,14 @@ class UserListItem extends StatelessWidget {
     );
   }
 
-  Future<void> sendRequest(String uid) async {
-    User asker = FirebaseAuth.instance.currentUser!;
-    await friendRequestRepository.createRequest(asker.uid, uid);
+  Future<void> acceptRequest(String askerId) async {
+    User currentUserId = FirebaseAuth.instance.currentUser!;
+    await friendRequestRepository.deleteRequestByAskerId(askerId, currentUserId.uid);
+    //dodaj do znajomych
+  }
+
+  Future<void> deleteRequest(String askerId) async {
+    User currentUserId = FirebaseAuth.instance.currentUser!;
+    await friendRequestRepository.deleteRequestByAskerId(askerId, currentUserId.uid);
   }
 }

@@ -1,17 +1,20 @@
 
 import 'package:flutter/material.dart';
+import 'package:tourpis/repository/friend_request_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';
+import 'package:tourpis/screens/friends/add_friends/invitations_fragment.dart';
 import 'package:tourpis/screens/friends/add_friends/search_users_fragmet.dart';
 import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 
 import '../../../models/UserModel.dart';
 import '../../../utils/color_utils.dart';
-import '../../home/home_recommended_page.dart';
 
 class UsersView extends State<UsersScreen> {
   final UserRepository _userRepository = UserRepository();
+  final FriendRequestRepository _friendRequestRepository = FriendRequestRepository();
 
   List<UserModel> _usersList = [];
+  List<UserModel> _requestList = [];
   int _selectedIndex = 0;
 
   @override
@@ -28,8 +31,10 @@ class UsersView extends State<UsersScreen> {
 
   Future<void> _loadUsersList() async {
     List<UserModel> allUsers = await _userRepository.getAllUsersExceptFriends();
+    List<UserModel> allRequest = await _friendRequestRepository.getAllRequestToUser();
     setState(() {
       _usersList = allUsers;
+      _requestList = allRequest;
     });
   }
 
@@ -37,7 +42,7 @@ class UsersView extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Znajdź przyjaciół"),
+        title: const Text("Znajdź znajomych"),
         backgroundColor: hexStringToColor("0B3963"),
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -59,37 +64,10 @@ class UsersView extends State<UsersScreen> {
         ),
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.height * 0.02,
-              ),
-              child: Row(
-                children: [
-                  // Search Bar
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: "Szukaj...",
-                          contentPadding: EdgeInsets.all(10),
-                          prefixIcon: Icon(Icons.search),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: _selectedIndex == 0
                   ? SearchUsersFragment(usersList: _usersList)
-                  : const HomeRecommendedPage(),
+                  : InvitationsFragment(usersList: _requestList),
             ),
           ],
         ),

@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:tourpis/screens/friends/add_friends/requests/request_list_item.dart';
+
+import '../../../models/UserModel.dart';
 
 class InvitationsFragment extends StatelessWidget {
+  final List<UserModel> usersList;
+
+  const InvitationsFragment({super.key, required this.usersList});
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "Zaproszenia Fragment",
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: usersList.isNotEmpty
+              ? ListView.builder(
+            itemCount: usersList.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: RequestListItem(user: usersList[index]),
+              );
+            },
+          )
+              : const Center(
+            child: Text("Nie masz jeszcze żadnych zaproszeń."),
+          ),
+        ),
+      ],
     );
   }
 }

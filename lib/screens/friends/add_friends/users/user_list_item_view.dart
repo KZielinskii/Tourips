@@ -1,15 +1,15 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../models/UserModel.dart';
+import '../../../../models/UserModel.dart';
 
-class ListItemView extends StatelessWidget {
+class UserListItemView extends StatelessWidget {
   final ImageProvider image;
   final String buttonText;
   final VoidCallback onPressed;
   final UserModel user;
 
-  const ListItemView({
+  const UserListItemView({
     super.key,
     required this.image,
     required this.buttonText,

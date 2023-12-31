@@ -40,34 +40,6 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
             ),
           ),
         ),
-        for (UserModel friend in friendsList)
-          ListTile(
-            title: Text(friend.login ?? ""),
-            onTap: () {
-              //todo
-              Navigator.pop(context);
-            },
-          ),
-        ListTile(
-          title: Container(
-            child: TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: 'Wyszukaj znajomych...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.lightBlueAccent,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              ),
-              onChanged: (value) {
-                //todo
-              },
-            ),
-          ),
-        ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           child: InkWell(
@@ -101,6 +73,22 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
             ),
           ),
         ),
+        for (UserModel friend in friendsList)
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            decoration: BoxDecoration(
+              color: hexStringToColor("2F73B1"),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: ListTile(
+              leading: const Icon(Icons.person, color: Colors.white),
+              title: Text(friend.login, style: const TextStyle(color: Colors.white),),
+              onTap: () {
+                //todo profil użytkownika
+                Navigator.pop(context);
+              },
+            ),
+          ),
       ],
     ),
   );

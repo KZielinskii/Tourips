@@ -1,15 +1,18 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:tourpis/screens/friends/add_friends/list_item_view.dart';
+import 'package:tourpis/repository/friend_request_repository.dart';
+import 'package:tourpis/screens/friends/add_friends/users/user_list_item_view.dart';
 
-import '../../../models/UserModel.dart';
+import '../../../../models/UserModel.dart';
 
 class UserListItem extends StatelessWidget {
   final UserModel user;
+  final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
 
-  const UserListItem({super.key, required this.user});
+  UserListItem({super.key, required this.user});
 
   Future<File?> _loadUserProfileImage(String userId) async {
     Reference storageReference =
@@ -33,24 +36,29 @@ class UserListItem extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.data != null) {
-          return ListItemView(
+          return UserListItemView(
             image: NetworkImage(snapshot.data!.path),
             buttonText: "Dodaj znajomego",
             onPressed: () {
-              //todo Dodaj logikę dodawania znajomego
+              sendRequest(user.uid);
             }, user: user,
           );
         } else {
-          return ListItemView(
+          return UserListItemView(
             image: const AssetImage("assets/images/no_image.png"),
             buttonText: "Dodaj znajomego",
             onPressed: () {
-              //todo Dodaj logikę dodawania znajomego
+              sendRequest(user.uid);
             },
             user: user,
           );
         }
       },
     );
+  }
+
+  Future<void> sendRequest(String uid) async {
+    User asker = FirebaseAuth.instance.currentUser!;
+    await friendRequestRepository.createRequest(asker.uid, uid);
   }
 }

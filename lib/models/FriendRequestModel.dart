@@ -15,4 +15,12 @@ class FriendRequestModel {
       "friend": friend,
     };
   }
+
+  factory FriendRequestModel.fromJson(Map<String, dynamic> json) {
+    return FriendRequestModel(
+      id: json['id'],
+      asker: json['asker'],
+      friend: json['friend'],
+    );
+  }
 }

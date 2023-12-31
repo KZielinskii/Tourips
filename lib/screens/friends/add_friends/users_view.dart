@@ -42,7 +42,7 @@ class UsersView extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Znajdź przyjaciół"),
+        title: const Text("Znajdź znajomych"),
         backgroundColor: hexStringToColor("0B3963"),
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -64,33 +64,6 @@ class UsersView extends State<UsersScreen> {
         ),
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.height * 0.02,
-              ),
-              child: Row(
-                children: [
-                  // Search Bar
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: "Szukaj...",
-                          contentPadding: EdgeInsets.all(10),
-                          prefixIcon: Icon(Icons.search),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: _selectedIndex == 0
                   ? SearchUsersFragment(usersList: _usersList)

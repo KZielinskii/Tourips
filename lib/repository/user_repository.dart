@@ -84,9 +84,15 @@ class UserRepository {
         .get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      bool isFriend = false;
       UserModel user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
-      if (user.uid != currentUserId && !friendsList.contains(user)) {
-        allUsers.add(user);
+      if (user.uid != currentUserId) {
+        for (var friend in friendsList) {
+          if(friend.uid == user.uid) {
+            isFriend = true;
+          }
+        }
+        if(!isFriend) allUsers.add(user);
       }
     }
 

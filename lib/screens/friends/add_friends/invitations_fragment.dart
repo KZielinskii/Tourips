@@ -14,7 +14,8 @@ class InvitationsFragment extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          child: ListView.builder(
+          child: usersList.isNotEmpty
+              ? ListView.builder(
             itemCount: usersList.length,
             itemBuilder: (context, index) {
               return Padding(
@@ -22,6 +23,9 @@ class InvitationsFragment extends StatelessWidget {
                 child: RequestListItem(user: usersList[index]),
               );
             },
+          )
+              : const Center(
+            child: Text("Nie masz jeszcze żadnych zaproszeń."),
           ),
         ),
       ],

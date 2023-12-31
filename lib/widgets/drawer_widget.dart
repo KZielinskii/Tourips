@@ -41,30 +41,28 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
           ),
         ),
         ListTile(
-          title: Container(
-            child: TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: 'Wyszukaj znajomych...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.lightBlueAccent,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          title: TextField(
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.search),
+              hintText: 'Wyszukaj znajomych...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
-              onChanged: (value) {
-                //todo
-              },
+              filled: true,
+              fillColor: Colors.lightBlueAccent,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             ),
+            onChanged: (value) {
+              //todo szukanie znajomych
+            },
           ),
         ),
         for (UserModel friend in friendsList)
           ListTile(
-            title: Text(friend.login ?? ""),
+            title: Text(friend.login),
             onTap: () {
-              //todo
+              //todo profil użytkownika
               Navigator.pop(context);
             },
           ),

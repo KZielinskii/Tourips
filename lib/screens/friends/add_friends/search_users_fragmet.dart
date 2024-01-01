@@ -1,43 +1,58 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:tourpis/screens/friends/add_friends/users/user_list_item.dart';
 
 import '../../../models/UserModel.dart';
+import '../../../repository/user_repository.dart';
 
 class SearchUsersFragment extends StatefulWidget {
-  final List<UserModel> usersList;
-
-  const SearchUsersFragment({super.key, required this.usersList});
+  const SearchUsersFragment({super.key});
 
   @override
   _SearchUsersFragmentState createState() => _SearchUsersFragmentState();
 }
 
 class _SearchUsersFragmentState extends State<SearchUsersFragment> {
-  late List<UserModel>? filteredUsersList;
+  final UserRepository _userRepository = UserRepository();
+  late List<UserModel> allUsers;
+  late List<UserModel> filteredUsersList;
+
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    filteredUsersList = widget.usersList;
+    allUsers = [];
+    filteredUsersList = [];
+    _initializeUsersList();
   }
 
-  void filterUsersList(String query) {
+  Future<void> _initializeUsersList() async {
+    try {
+      allUsers = await _userRepository.getAllUsersExceptFriends();
+      _updateFilteredUsersList("");
+    } catch (error) {
+      print("Error loading users: $error");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _updateFilteredUsersList(String query) {
     setState(() {
-      isLoading = true;
-      filteredUsersList = widget.usersList
+      filteredUsersList = allUsers
           .where(
-              (user) => user.login.toLowerCase().contains(query.toLowerCase()))
+            (user) => user.login.toLowerCase().contains(query.toLowerCase()),
+      )
           .toList();
-      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    filteredUsersList ??= List.from(widget.usersList ?? []);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -55,7 +70,7 @@ class _SearchUsersFragmentState extends State<SearchUsersFragment> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: TextFormField(
-                    onChanged: filterUsersList,
+                    onChanged: (query) => _updateFilteredUsersList(query),
                     decoration: const InputDecoration(
                       hintText: "Szukaj...",
                       contentPadding: EdgeInsets.all(10),
@@ -70,20 +85,19 @@ class _SearchUsersFragmentState extends State<SearchUsersFragment> {
         ),
         Expanded(
           child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
-                  itemCount: filteredUsersList?.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: UserListItem(user: filteredUsersList![index]),
-                    );
-                  },
-                ),
+            itemCount: filteredUsersList.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: UserListItem(user: filteredUsersList[index]),
+              );
+            },
+          ),
         ),
       ],
     );
   }
 }
+

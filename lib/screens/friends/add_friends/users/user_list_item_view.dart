@@ -8,6 +8,7 @@ class UserListItemView extends StatelessWidget {
   final String buttonText;
   final VoidCallback onPressed;
   final UserModel user;
+  final bool isButtonEnabled;
 
   const UserListItemView({
     super.key,
@@ -15,6 +16,7 @@ class UserListItemView extends StatelessWidget {
     required this.buttonText,
     required this.onPressed,
     required this.user,
+    required this.isButtonEnabled,
   });
 
   @override
@@ -51,7 +53,7 @@ class UserListItemView extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             ElevatedButton.icon(
-              onPressed: onPressed,
+              onPressed: isButtonEnabled ? onPressed : null,
               icon: const Icon(Icons.person_add),
               label: Text(buttonText),
             ),

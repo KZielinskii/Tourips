@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/screens/friends/add_friends/users/user_list_item.dart';
@@ -15,12 +17,23 @@ class SearchUsersFragment extends StatefulWidget {
 
 class _SearchUsersFragmentState extends State<SearchUsersFragment> {
   late List<UserModel>? filteredUsersList;
+  late Timer timer;
+
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     filteredUsersList = widget.usersList;
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (filteredUsersList != widget.usersList) {
+        setState(() {
+          filteredUsersList = widget.usersList;
+          isLoading = false;
+          timer.cancel();
+        });
+      }
+    });
   }
 
   void filterUsersList(String query) {
@@ -36,7 +49,6 @@ class _SearchUsersFragmentState extends State<SearchUsersFragment> {
 
   @override
   Widget build(BuildContext context) {
-    filteredUsersList ??= List.from(widget.usersList ?? []);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -8,11 +8,21 @@ import 'package:tourpis/screens/friends/add_friends/users/user_list_item_view.da
 
 import '../../../../models/UserModel.dart';
 
-class UserListItem extends StatelessWidget {
+class UserListItem extends StatefulWidget {
   final UserModel user;
-  final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
 
-  UserListItem({super.key, required this.user});
+  const UserListItem({super.key, required this.user});
+
+  @override
+  _UserListItemState createState() => _UserListItemState(user);
+}
+
+class _UserListItemState extends State<UserListItem> {
+  late final UserModel user;
+  final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
+  bool isButtonEnabled = true;
+
+  _UserListItemState(this.user);
 
   Future<File?> _loadUserProfileImage(String userId) async {
     Reference storageReference =
@@ -41,7 +51,9 @@ class UserListItem extends StatelessWidget {
             buttonText: "Dodaj znajomego",
             onPressed: () {
               sendRequest(user.uid);
-            }, user: user,
+            },
+            isButtonEnabled: isButtonEnabled,
+            user: user,
           );
         } else {
           return UserListItemView(
@@ -50,6 +62,7 @@ class UserListItem extends StatelessWidget {
             onPressed: () {
               sendRequest(user.uid);
             },
+            isButtonEnabled: isButtonEnabled,
             user: user,
           );
         }
@@ -58,7 +71,12 @@ class UserListItem extends StatelessWidget {
   }
 
   Future<void> sendRequest(String uid) async {
-    User asker = FirebaseAuth.instance.currentUser!;
-    await friendRequestRepository.createRequest(asker.uid, uid);
+    if(isButtonEnabled) {
+      User asker = FirebaseAuth.instance.currentUser!;
+      await friendRequestRepository.createRequest(asker.uid, uid);
+      setState(() {
+        isButtonEnabled = false;
+      });
+    }
   }
 }

@@ -11,9 +11,10 @@ import '../../../../models/UserModel.dart';
 
 class RequestListItem extends StatelessWidget {
   final UserModel user;
+  final Function onUpdate;
   final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
 
-  RequestListItem({super.key, required this.user});
+  RequestListItem({super.key, required this.user, required this.onUpdate});
 
   Future<File?> _loadUserProfileImage(String userId) async {
     Reference storageReference =
@@ -70,10 +71,12 @@ class RequestListItem extends StatelessWidget {
     User currentUser = FirebaseAuth.instance.currentUser!;
     await friendRequestRepository.deleteRequestByAskerId(askerId, currentUser.uid);
     await FriendsRepository().addFriend(askerId, currentUser.uid);
+    onUpdate();
   }
 
   Future<void> deleteRequest(String askerId) async {
     User currentUserId = FirebaseAuth.instance.currentUser!;
     await friendRequestRepository.deleteRequestByAskerId(askerId, currentUserId.uid);
+    onUpdate();
   }
 }

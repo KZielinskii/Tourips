@@ -74,13 +74,14 @@ class UserRepository {
     }
   }
 
-  Future<List<UserModel>> getAllUsersExceptFriends() async {
+  Future<List<UserModel>> getAllUsersExceptFriends({int limit = 10}) async {
     List<UserModel> allUsers = [];
     List<UserModel> friendsList = await FriendsRepository().loadFriendsList();
     String? currentUserId = await UserRepository().getCurrentUserId();
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
+        .limit(limit)
         .get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
@@ -88,15 +89,16 @@ class UserRepository {
       UserModel user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
       if (user.uid != currentUserId) {
         for (var friend in friendsList) {
-          if(friend.uid == user.uid) {
+          if (friend.uid == user.uid) {
             isFriend = true;
           }
         }
-        if(!isFriend) allUsers.add(user);
+        if (!isFriend) allUsers.add(user);
       }
     }
 
     return allUsers;
   }
+
 
 }

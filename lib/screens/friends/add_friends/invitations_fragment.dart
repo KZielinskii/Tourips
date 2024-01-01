@@ -4,37 +4,34 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/screens/friends/add_friends/requests/request_list_item.dart';
 
 import '../../../models/UserModel.dart';
+import '../../../repository/friend_request_repository.dart';
 
 class InvitationsFragment extends StatefulWidget {
-  final List<UserModel> usersList;
 
-  const InvitationsFragment({super.key, required this.usersList});
+  const InvitationsFragment({super.key});
 
   @override
   _InvitationsFragmentState createState() => _InvitationsFragmentState();
 }
 
 class _InvitationsFragmentState extends State<InvitationsFragment> {
-  late List<UserModel>? filteredUsersList;
-  late Timer timer;
+  final FriendRequestRepository _friendRequestRepository = FriendRequestRepository();
+  late List<UserModel> allRequest;
+  late StreamController<List<UserModel>> _controller;
 
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    filteredUsersList = widget.usersList;
-    if(widget.usersList.isEmpty){
-      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (filteredUsersList != widget.usersList) {
-          setState(() {
-            filteredUsersList = widget.usersList;
-            isLoading = false;
-            timer.cancel();
-          });
-        }
-      });
-    }
+    allRequest = [];
+    _controller = StreamController<List<UserModel>>.broadcast();
+    _loadUsersList();
+  }
+
+  Future<void> _loadUsersList() async {
+    allRequest = await _friendRequestRepository.getAllRequestToUser();
+    _controller.add(allRequest);
   }
 
   @override
@@ -43,29 +40,47 @@ class _InvitationsFragmentState extends State<InvitationsFragment> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          child: filteredUsersList!.isNotEmpty
-              ? ListView.builder(
-                  itemCount: filteredUsersList?.length,
+          child: StreamBuilder<List<UserModel>>(
+            stream: _controller.stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<UserModel> data = snapshot.data!;
+                return data.isNotEmpty
+                    ? ListView.builder(
+                  itemCount: data.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: RequestListItem(
-                        user: filteredUsersList![index],
+                        user: data[index],
                         onUpdate: () => _updateList(index),
                       ),
                     );
                   },
                 )
-              : const Center(
+                    : const Center(
                   child: Text("Nie masz jeszcze żadnych zaproszeń."),
-                ),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
         ),
       ],
     );
   }
 
   Future<void> _updateList(int index) async {
-    filteredUsersList?.removeAt(index);
-    setState(() {});
+    allRequest.removeAt(index);
+    _controller.add(allRequest);
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
   }
 }

@@ -54,6 +54,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     print("Sign In");
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
                   }).onError((error, stackTrace) {
+                    createSnackBarError("Nieprawidołowy login lub hasło", context);
                     print("Error ${error.toString()}");
                   });
                 }),
@@ -85,4 +86,3 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 }
-//todo Wyświetlanie komunikatów o nieporawnym logowaniu

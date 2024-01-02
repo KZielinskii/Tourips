@@ -10,8 +10,9 @@ import '../add_friends/users/user_list_item_view.dart';
 class FriendListItem extends StatefulWidget {
   final UserModel user;
   final List<String> requestList;
+  final Function(List<String>) onRequestListChanged;
 
-  const FriendListItem({super.key, required this.user, required this.requestList});
+  const FriendListItem({super.key, required this.user, required this.requestList, required this.onRequestListChanged});
 
   @override
   _FriendListItemState createState() => _FriendListItemState();

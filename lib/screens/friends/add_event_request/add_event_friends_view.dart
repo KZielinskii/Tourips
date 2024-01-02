@@ -44,57 +44,65 @@ class AddEventFriendsListScreenState extends State<AddEventFriendsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Znajdź znajomych"),
-          backgroundColor: hexStringToColor("0B3963"),
-          titleTextStyle: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: const Text("Znajdź znajomych"),
+        backgroundColor: hexStringToColor("0B3963"),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              hexStringToColor("2F73B1"),
+              hexStringToColor("2F73B1"),
+              hexStringToColor("0B3963"),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
         ),
-        body: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  hexStringToColor("2F73B1"),
-                  hexStringToColor("2F73B1"),
-                  hexStringToColor("0B3963"),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: MediaQuery.of(context).size.height * 0.02,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.05,
-                    vertical: MediaQuery.of(context).size.height * 0.02,
-                  ),
-                ),
-                Expanded(
-                  child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                          itemCount: _friendsList.length,
-                          itemBuilder: (context, index) {
-                            final user = _friendsList[index];
-                            return Padding(
-                              key: ValueKey(user.uid),
-                              padding: const EdgeInsets.all(8.0),
-                              child: FriendListItem(user: user, requestList: _requestList,),
-                            );
-                          },
-                        ),
-                ),
-              ],
+            Expanded(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                itemCount: _friendsList.length,
+                itemBuilder: (context, index) {
+                  final user = _friendsList[index];
+                  return Padding(
+                    key: ValueKey(user.uid),
+                    padding: const EdgeInsets.all(8.0),
+                    child: FriendListItem(
+                      user: user,
+                      requestList: _requestList,
+                      onRequestListChanged: (List<String> updatedList) {
+                        setState(() {
+                          _requestList = updatedList;
+                        });
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
+          ],
         ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          widget.requestList = _requestList;
+          widget.onRequestListChanged(_requestList);
           Navigator.pop(context);
         },
         child: const Icon(Icons.check),

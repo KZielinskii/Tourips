@@ -5,7 +5,7 @@ class EventRequestRepository {
   final _db = FirebaseFirestore.instance;
 
   Future<void> createRequest(String eventId, String userId, bool ownerRequest) async {
-    EventRequestModel eventRequest = EventRequestModel(eventId: 'eventId', userId: 'userId', ownerRequest: ownerRequest);
+    EventRequestModel eventRequest = EventRequestModel(eventId: eventId, userId: userId, ownerRequest: true);
     await _db.collection('event_requests').doc().set(eventRequest.toJson());
   }
 }

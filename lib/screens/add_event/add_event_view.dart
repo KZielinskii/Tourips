@@ -59,7 +59,7 @@ class AddEventView extends State<AddEventScreen> {
       setState(() {
         _selectedStartDate = pickedDate;
         _dateStartTextController.text =
-            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+        "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
 
       TimeOfDay? pickedTime = await showTimePicker(
@@ -71,7 +71,7 @@ class AddEventView extends State<AddEventScreen> {
         setState(() {
           _selectedStartTime = pickedTime;
           _timeStartTextController.text =
-              "${pickedTime.hour}:${pickedTime.minute}";
+          "${pickedTime.hour}:${pickedTime.minute}";
         });
       }
     }
@@ -89,7 +89,7 @@ class AddEventView extends State<AddEventScreen> {
       setState(() {
         _selectedEndDate = pickedDate;
         _dateEndTextController.text =
-            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+        "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
 
       TimeOfDay? pickedTime = await showTimePicker(
@@ -101,7 +101,7 @@ class AddEventView extends State<AddEventScreen> {
         setState(() {
           _selectedEndTime = pickedTime;
           _timeEndTextController.text =
-              "${pickedTime.hour}:${pickedTime.minute}";
+          "${pickedTime.hour}:${pickedTime.minute}";
         });
       }
     }
@@ -231,18 +231,18 @@ class AddEventView extends State<AddEventScreen> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                    const Icon(Icons.calendar_today, color: Colors.blue),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      _dateStartTextController.text.isNotEmpty
-                          ? '${_dateStartTextController.text} ${_timeStartTextController.text}'
-                          : 'Wybierz datę rozpoczęcia.',
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ]),
+                        const Icon(Icons.calendar_today, color: Colors.blue),
+                        const SizedBox(width: 8.0),
+                        Text(
+                          _dateStartTextController.text.isNotEmpty
+                              ? '${_dateStartTextController.text} ${_timeStartTextController.text}'
+                              : 'Wybierz datę rozpoczęcia.',
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ]),
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
@@ -257,8 +257,8 @@ class AddEventView extends State<AddEventScreen> {
                             ? '${_dateEndTextController.text} ${_timeEndTextController.text}'
                             : 'Wybierz datę zakończenia.',
                         style: const TextStyle(
-                            color: Colors.blue,
-                            fontSize: 18,
+                          color: Colors.blue,
+                          fontSize: 18,
                         ),
                       ),
                     ],
@@ -295,15 +295,25 @@ class AddEventView extends State<AddEventScreen> {
                     const SizedBox(width: 16.0),
                     InkWell(
                       onTap: () async {
-                        Navigator.push(
+                        final selectedUsers = await Navigator.push<List<String>>(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AddEventFriendsListScreen(requestList: _requestList),
+                            builder: (context) => AddEventFriendsListScreen(
+                              requestList: _requestList,
+                              onRequestListChanged: (List<String> updatedList) {
+                                setState(() {
+                                  _requestList = updatedList;
+                                });
+                              },
+                            ),
                           ),
                         );
-                        setState(() {
-                          doneFriends = true;
-                        });
+                        if (selectedUsers != null && selectedUsers.isNotEmpty) {
+                          setState(() {
+                            _requestList = selectedUsers;
+                            doneFriends = true;
+                          });
+                        }
                       },
                       child: Column(
                         children: [
@@ -376,7 +386,6 @@ class AddEventView extends State<AddEventScreen> {
               sendRequestToEvent(eventId!);
             }
 
-
             Navigator.pop(context);
           }
         },
@@ -397,10 +406,9 @@ class AddEventView extends State<AddEventScreen> {
 
   void sendRequestToEvent(String eventId) {
     try {
-      for(var userId in _requestList) {
+      for (var userId in _requestList) {
         eventRequestRepository.createRequest(eventId, userId, true);
         print(userId);
-        //tutaj jest pusta lista
       }
     } catch (e) {
       print("Error send request");

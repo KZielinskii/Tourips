@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tourpis/repository/event_participants_repository.dart';
 import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
+import 'package:tourpis/repository/user_repository.dart';
 
 import '../../../utils/color_utils.dart';
 import '../../../widgets/widget.dart';
@@ -22,8 +24,10 @@ class AddEventView extends State<AddEventScreen> {
   late TimeOfDay _selectedStartTime = TimeOfDay.now();
   late DateTime _selectedEndDate = DateTime.now();
   late TimeOfDay _selectedEndTime = TimeOfDay.now();
+  final userRepository = UserRepository();
   final eventRepository = EventRepository();
   final eventRequestRepository = EventRequestRepository();
+  final eventParticipantsRepository = EventParticipantsRepository();
 
   List<LatLng> _points = [];
   List<String> _requestList = [];
@@ -404,12 +408,14 @@ class AddEventView extends State<AddEventScreen> {
     createSnackBar('Trasa została zapisana.', context);
   }
 
-  void sendRequestToEvent(String eventId) {
+  Future<void> sendRequestToEvent(String eventId) async {
     try {
+      String? userId = await userRepository.getCurrentUserId();
+      eventParticipantsRepository.create(eventId);
       for (var userId in _requestList) {
         eventRequestRepository.createRequest(eventId, userId, true);
-        print(userId);
       }
+      eventParticipantsRepository.addUserToEvent(userId!, eventId);
     } catch (e) {
       print("Error send request");
     }

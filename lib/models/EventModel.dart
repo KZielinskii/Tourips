@@ -2,7 +2,7 @@ import 'package:cloud_firestore_platform_interface/src/geo_point.dart';
 
 class EventModel {
   final String? id;
-  final String? owner;
+  final String owner;
   final String title;
   final String description;
   final DateTime startDate;

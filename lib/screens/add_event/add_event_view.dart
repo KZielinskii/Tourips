@@ -295,7 +295,7 @@ class AddEventView extends State<AddEventScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AddEventFriendsListScreen(),
+                            builder: (context) => const AddEventFriendsListScreen(),
                           ),
                         );
                         setState(() {

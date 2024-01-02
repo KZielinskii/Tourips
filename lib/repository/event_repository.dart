@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import '../models/EventModel.dart';
 import '../models/UserModel.dart';

@@ -86,11 +86,6 @@ class UserRepository {
     List<UserModel> receivedRequestsList =
         await friendRequestRepository.getAllRequestToUser();
 
-    print(friendsList.length);
-    print(sentRequestsList.length);
-    print(receivedRequestsList.first.login);
-    print(allUsers.length);
-
     allUsers = querySnapshot.docs
         .map((doc) => UserModel.fromJson(doc.data() as Map<String, dynamic>))
         .where((user) =>
@@ -102,8 +97,6 @@ class UserRepository {
             !receivedRequestsList
                 .any((requestUser) => requestUser.uid == user.uid))
         .toList();
-
-    print(allUsers.length);
 
     return allUsers;
   }

@@ -126,33 +126,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<bool> correctPasswordAndLogin() async {
     if (await userRepository.checkIfLoginExists(_loginTextController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Login już jest zajęty."),
-      ));
+      createSnackBarError("Login już jest zajęty.", context);
       return false;
     }
     if (_passwordTextController.text != _passwordRepeatTextController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Hasła nie są takie same."),
-      ));
+      createSnackBarError("Hasła nie są takie same." , context);
       return false;
     }
     if (_passwordTextController.text.length < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Hasło nie może być krótsze niż 8 znaków"),
-      ));
+      createSnackBarError("Hasło nie może być krótsze niż 8 znaków" , context);
       return false;
     }
     if (!_passwordTextController.text.contains(RegExp(r'\d'))) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Hasło musi zawierać co najmniej jedną liczbę."),
-      ));
+      createSnackBarError("Hasło musi zawierać co najmniej jedną\nliczbę.", context);
       return false;
     }
     if (!_passwordTextController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Hasło musi zawierać co najmniej jeden znak specjalny."),
-      ));
+      createSnackBarError("Hasło musi zawierać co najmniej jeden\nznak specjalny.", context);
       return false;
     }
     return true;

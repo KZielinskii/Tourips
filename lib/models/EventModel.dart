@@ -35,4 +35,20 @@ class EventModel {
       "route": route,
     };
   }
+
+  factory EventModel.fromJson(Map<String, dynamic> json) {
+    return EventModel(
+      id: json['id'],
+      owner: json['owner'],
+      title: json['title'],
+      description: json['description'],
+      startDate: DateTime.parse(json['startDate']),
+      endDate: DateTime.parse(json['endDate']),
+      capacity: json['capacity'],
+      participants: json['participants'],
+      route: (json['route'] as List<dynamic>)
+          .map((geoPoint) => GeoPoint(geoPoint['latitude'], geoPoint['longitude']))
+          .toList(),
+    );
+  }
 }

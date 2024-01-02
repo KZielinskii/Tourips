@@ -78,7 +78,7 @@ Container singInButton(BuildContext context, bool isLogin, Function onTab) {
 void createSnackBar(String text, BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -86,12 +86,12 @@ void createSnackBar(String text, BuildContext context) {
             text,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 26,
+              fontSize: 16,
             ),
           ),
         ],
       ),
-      backgroundColor: Colors.lightGreenAccent,
+      backgroundColor: Colors.green,
     ),
   );
 }

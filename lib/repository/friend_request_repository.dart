@@ -19,14 +19,30 @@ class FriendRequestRepository {
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('requests')
+        .where('friend', isEqualTo: currentUserId)
         .get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       FriendRequestModel requestModel = FriendRequestModel.fromJson(doc.data() as Map<String, dynamic>);
-      if (requestModel.friend == currentUserId) {
-        UserModel? user = await _userRepository.getUserByUid(requestModel.asker!);
-        allRequest.add(user!);
-      }
+      UserModel? user = await _userRepository.getUserByUid(requestModel.asker!);
+      allRequest.add(user!);
+    }
+
+    return allRequest;
+  }
+
+  Future<List<UserModel>> getAllRequestFromUser(String userId) async {
+    List<UserModel> allRequest = [];
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('requests')
+        .where('asker', isEqualTo: userId)
+        .get();
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      FriendRequestModel requestModel = FriendRequestModel.fromJson(doc.data() as Map<String, dynamic>);
+      UserModel? user = await _userRepository.getUserByUid(requestModel.friend!);
+      allRequest.add(user!);
     }
 
     return allRequest;

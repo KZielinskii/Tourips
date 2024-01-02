@@ -54,6 +54,7 @@ class _InvitationsFragmentState extends State<InvitationsFragment> {
                       child: RequestListItem(
                         user: data[index],
                         onUpdate: () => _updateList(index),
+                        context: context,
                       ),
                     );
                   },

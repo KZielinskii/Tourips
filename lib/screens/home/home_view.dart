@@ -96,7 +96,6 @@ class HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Search Bar
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
@@ -113,7 +112,7 @@ class HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10), // Spacer
+                  const SizedBox(width: 10),
                   InkWell(
                     onTap: () {
                       Navigator.push(

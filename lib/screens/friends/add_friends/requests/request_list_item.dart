@@ -6,19 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
 import 'package:tourpis/repository/friends_repository.dart';
 import 'package:tourpis/screens/friends/add_friends/requests/request_list_item_view.dart';
+import 'package:tourpis/widgets/widget.dart';
 
 import '../../../../models/UserModel.dart';
 
 class RequestListItem extends StatelessWidget {
   final UserModel user;
   final Function onUpdate;
-  final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
+  final BuildContext context;
+  final FriendRequestRepository friendRequestRepository =
+      FriendRequestRepository();
 
-  RequestListItem({super.key, required this.user, required this.onUpdate});
+  RequestListItem({super.key, required this.user, required this.onUpdate, required this.context});
 
   Future<File?> _loadUserProfileImage(String userId) async {
     Reference storageReference =
-    FirebaseStorage.instance.ref().child('images/${user.uid}.png');
+        FirebaseStorage.instance.ref().child('images/${user.uid}.png');
 
     try {
       String downloadURL = await storageReference.getDownloadURL();
@@ -29,7 +32,6 @@ class RequestListItem extends StatelessWidget {
       return null;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,8 @@ class RequestListItem extends StatelessWidget {
             },
             onPressedSecond: () {
               deleteRequest(user.uid);
-            }, user: user,
+            },
+            user: user,
           );
         } else {
           return RequestListItemView(
@@ -68,15 +71,29 @@ class RequestListItem extends StatelessWidget {
   }
 
   Future<void> acceptRequest(String askerId) async {
-    User currentUser = FirebaseAuth.instance.currentUser!;
-    await friendRequestRepository.deleteRequestByAskerId(askerId, currentUser.uid);
-    await FriendsRepository().addFriend(askerId, currentUser.uid);
-    onUpdate();
+    try {
+      User currentUser = FirebaseAuth.instance.currentUser!;
+      await friendRequestRepository.deleteRequestByAskerId(
+          askerId, currentUser.uid);
+      await FriendsRepository().addFriend(askerId, currentUser.uid);
+      onUpdate();
+      createSnackBar("Dodano użytkownia do grona znajomych.", context);
+    } catch (error) {
+      print('Error adding a user.');
+      createSnackBarError("Błąd serwera.", context);
+    }
   }
 
   Future<void> deleteRequest(String askerId) async {
-    User currentUserId = FirebaseAuth.instance.currentUser!;
-    await friendRequestRepository.deleteRequestByAskerId(askerId, currentUserId.uid);
-    onUpdate();
+    try {
+      User currentUserId = FirebaseAuth.instance.currentUser!;
+      await friendRequestRepository.deleteRequestByAskerId(
+          askerId, currentUserId.uid);
+      onUpdate();
+      createSnackBar("Zaproszenie usunięte", context);
+    } catch (error) {
+      print('Error deleting request.');
+      createSnackBarError("Błąd serwera.", context);
+    }
   }
 }

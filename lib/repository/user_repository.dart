@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../models/UserModel.dart';
+import 'friend_request_repository.dart';
 import 'friends_repository.dart';
 
 class UserRepository {
@@ -16,28 +18,24 @@ class UserRepository {
   }
 
   Future<bool> checkIfLoginExists(String login) async {
-    QuerySnapshot querySnapshot = await _db
-        .collection('users')
-        .where('login', isEqualTo: login)
-        .get();
+    QuerySnapshot querySnapshot =
+        await _db.collection('users').where('login', isEqualTo: login).get();
 
     return querySnapshot.docs.isNotEmpty;
   }
 
   Future<void> createUser(String login, String email, String uid) async {
-
     UserModel user = UserModel(login: login, email: email, uid: uid);
     await _db.collection('users').doc().set(user.toJson());
   }
 
   Future<UserModel?> getUserByUid(String uid) async {
-    QuerySnapshot querySnapshot = await _db
-        .collection('users')
-        .where('uid', isEqualTo: uid)
-        .get();
+    QuerySnapshot querySnapshot =
+        await _db.collection('users').where('uid', isEqualTo: uid).get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      UserModel user = UserModel.fromJson(querySnapshot.docs.first.data() as Map<String, dynamic>);
+      UserModel user = UserModel.fromJson(
+          querySnapshot.docs.first.data() as Map<String, dynamic>);
       return user;
     } else {
       print('Nie znaleziono użytkownika o podanym UID');
@@ -62,7 +60,6 @@ class UserRepository {
 
     UserModel? userModel = await getUserByUid(uid);
     if (userModel != null) {
-
       String? id = await getUserIdByUid(uid);
       await _db.collection('users').doc(id).update({'login': newLogin});
       print('Update successful');
@@ -74,31 +71,40 @@ class UserRepository {
     }
   }
 
-  Future<List<UserModel>> getAllUsersExceptFriends({int limit = 10}) async {
+  Future<List<UserModel>> getAllUsersExceptFriends() async {
+    FriendRequestRepository friendRequestRepository = FriendRequestRepository();
+    FriendsRepository friendsRepository = FriendsRepository();
+
     List<UserModel> allUsers = [];
-    List<UserModel> friendsList = await FriendsRepository().loadFriendsList();
-    String? currentUserId = await UserRepository().getCurrentUserId();
+    List<UserModel> friendsList = await friendsRepository.loadFriendsList();
+    String? userId = await getCurrentUserId();
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').limit(64).get();
 
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .limit(limit)
-        .get();
+    List<UserModel> sentRequestsList =
+        await friendRequestRepository.getAllRequestFromUser(userId!);
+    List<UserModel> receivedRequestsList =
+        await friendRequestRepository.getAllRequestToUser();
 
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      bool isFriend = false;
-      UserModel user = UserModel.fromJson(doc.data() as Map<String, dynamic>);
-      if (user.uid != currentUserId) {
-        for (var friend in friendsList) {
-          if (friend.uid == user.uid) {
-            isFriend = true;
-          }
-        }
-        if (!isFriend) allUsers.add(user);
-      }
-    }
+    print(friendsList.length);
+    print(sentRequestsList.length);
+    print(receivedRequestsList.first.login);
+    print(allUsers.length);
+
+    allUsers = querySnapshot.docs
+        .map((doc) => UserModel.fromJson(doc.data() as Map<String, dynamic>))
+        .where((user) =>
+            user.uid != userId &&
+            !friendsList.any((friend) => friend.uid == user.uid) &&
+            user.uid != userId &&
+            !sentRequestsList
+                .any((requestUser) => requestUser.uid == user.uid) &&
+            !receivedRequestsList
+                .any((requestUser) => requestUser.uid == user.uid))
+        .toList();
+
+    print(allUsers.length);
 
     return allUsers;
   }
-
-
 }

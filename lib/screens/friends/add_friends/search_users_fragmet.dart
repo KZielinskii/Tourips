@@ -46,7 +46,7 @@ class _SearchUsersFragmentState extends State<SearchUsersFragment> {
       filteredUsersList = allUsers
           .where(
             (user) => user.login.toLowerCase().contains(query.toLowerCase()),
-      )
+          )
           .toList();
     });
   }
@@ -87,17 +87,18 @@ class _SearchUsersFragmentState extends State<SearchUsersFragment> {
           child: isLoading
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
-            itemCount: filteredUsersList.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: UserListItem(user: filteredUsersList[index]),
-              );
-            },
-          ),
+                  itemCount: filteredUsersList.length,
+                  itemBuilder: (context, index) {
+                    final user = filteredUsersList[index];
+                    return Padding(
+                      key: ValueKey(user.uid),
+                      padding: const EdgeInsets.all(8.0),
+                      child: UserListItem(user: user),
+                    );
+                  },
+                ),
         ),
       ],
     );
   }
 }
-

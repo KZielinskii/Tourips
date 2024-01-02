@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/repository/event_repository.dart';
+import 'package:tourpis/repository/event_request_repository.dart';
 
 import '../../../utils/color_utils.dart';
 import '../../../widgets/widget.dart';
-import '../friends/add_event_friends_screen.dart';
+import '../friends/add_event_request/add_event_friends_screen.dart';
 import '../map/map_screen.dart';
 import 'add_event_screen.dart';
 
@@ -22,8 +23,10 @@ class AddEventView extends State<AddEventScreen> {
   late DateTime _selectedEndDate = DateTime.now();
   late TimeOfDay _selectedEndTime = TimeOfDay.now();
   final eventRepository = EventRepository();
+  final eventRequestRepository = EventRequestRepository();
 
   List<LatLng> _points = [];
+  List<String> _requestList = [];
 
   bool doneMap = false;
   bool doneFriends = false;
@@ -295,7 +298,7 @@ class AddEventView extends State<AddEventScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const AddEventFriendsListScreen(),
+                            builder: (context) => AddEventFriendsListScreen(requestList: _requestList),
                           ),
                         );
                         setState(() {
@@ -357,13 +360,22 @@ class AddEventView extends State<AddEventScreen> {
               return GeoPoint(latLng.latitude, latLng.longitude);
             }).toList();
 
-            eventRepository.createEvent(
-                _titleController.text,
-                _descriptionController.text,
-                selectedStartDateTime,
-                selectedEndDateTime,
-                int.parse(_maxParticipantsController.text),
-                geoPoints);
+            String? eventId;
+
+            try {
+              eventId = await eventRepository.createEvent(
+                  _titleController.text,
+                  _descriptionController.text,
+                  selectedStartDateTime,
+                  selectedEndDateTime,
+                  int.parse(_maxParticipantsController.text),
+                  geoPoints);
+            } catch (e) {
+              createSnackBarError("Błąd serwera!\nSpróbuj ponownie.", context);
+            } finally {
+              sendRequestToEvent(eventId!);
+            }
+
 
             Navigator.pop(context);
           }
@@ -381,5 +393,17 @@ class AddEventView extends State<AddEventScreen> {
     });
 
     createSnackBar('Trasa została zapisana.', context);
+  }
+
+  void sendRequestToEvent(String eventId) {
+    try {
+      for(var userId in _requestList) {
+        eventRequestRepository.createRequest(eventId, userId, true);
+        print(userId);
+        //tutaj jest pusta lista
+      }
+    } catch (e) {
+      print("Error send request");
+    }
   }
 }

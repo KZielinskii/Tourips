@@ -7,13 +7,11 @@ class EventRepository {
   final _db = FirebaseFirestore.instance;
   final userRepository = UserRepository();
 
-  Future<void> createEvent(String title, String description, DateTime startDate, DateTime endDate, int capacity, List<GeoPoint> geoPoints) async {
+  Future<String?> createEvent(String title, String description, DateTime startDate, DateTime endDate, int capacity, List<GeoPoint> geoPoints) async {
     String? ownerId = await userRepository.getCurrentUserId();
 
     if (ownerId != null) {
       UserModel? owner = await userRepository.getUserByUid(ownerId);
-
-
 
       if (owner != null) {
         EventModel event = EventModel(
@@ -27,13 +25,17 @@ class EventRepository {
           route: geoPoints,
         );
 
-        await _db.collection('events').doc().set(event.toJson());
+        DocumentReference eventRef = await _db.collection('events').add(event.toJson());
+        String eventId = eventRef.id;
         print('Stworzono wydarzenie');
+        return eventId;
       } else {
         print('Błąd: Nie udało się pobrać informacji o właścicielu');
+        return null;
       }
     } else {
       print('Błąd: Nie udało się pobrać ID użytkownika');
+      return null;
     }
   }
 }

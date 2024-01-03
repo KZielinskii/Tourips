@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:tourpis/repository/event_participants_repository.dart';
 import 'package:tourpis/repository/event_repository.dart';
+import 'package:tourpis/repository/event_request_repository.dart';
+import 'package:tourpis/repository/user_repository.dart';
 
 import '../../../utils/color_utils.dart';
 import '../../../widgets/widget.dart';
-import '../friends/add_event_friends_screen.dart';
+import '../friends/add_event_request/add_event_friends_screen.dart';
 import '../map/map_screen.dart';
 import 'add_event_screen.dart';
 
@@ -21,9 +24,13 @@ class AddEventView extends State<AddEventScreen> {
   late TimeOfDay _selectedStartTime = TimeOfDay.now();
   late DateTime _selectedEndDate = DateTime.now();
   late TimeOfDay _selectedEndTime = TimeOfDay.now();
+  final userRepository = UserRepository();
   final eventRepository = EventRepository();
+  final eventRequestRepository = EventRequestRepository();
+  final eventParticipantsRepository = EventParticipantsRepository();
 
   List<LatLng> _points = [];
+  List<String> _requestList = [];
 
   bool doneMap = false;
   bool doneFriends = false;
@@ -56,7 +63,7 @@ class AddEventView extends State<AddEventScreen> {
       setState(() {
         _selectedStartDate = pickedDate;
         _dateStartTextController.text =
-            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+        "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
 
       TimeOfDay? pickedTime = await showTimePicker(
@@ -68,7 +75,7 @@ class AddEventView extends State<AddEventScreen> {
         setState(() {
           _selectedStartTime = pickedTime;
           _timeStartTextController.text =
-              "${pickedTime.hour}:${pickedTime.minute}";
+          "${pickedTime.hour}:${pickedTime.minute}";
         });
       }
     }
@@ -86,7 +93,7 @@ class AddEventView extends State<AddEventScreen> {
       setState(() {
         _selectedEndDate = pickedDate;
         _dateEndTextController.text =
-            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+        "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
 
       TimeOfDay? pickedTime = await showTimePicker(
@@ -98,7 +105,7 @@ class AddEventView extends State<AddEventScreen> {
         setState(() {
           _selectedEndTime = pickedTime;
           _timeEndTextController.text =
-              "${pickedTime.hour}:${pickedTime.minute}";
+          "${pickedTime.hour}:${pickedTime.minute}";
         });
       }
     }
@@ -228,18 +235,18 @@ class AddEventView extends State<AddEventScreen> {
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                    const Icon(Icons.calendar_today, color: Colors.blue),
-                    const SizedBox(width: 8.0),
-                    Text(
-                      _dateStartTextController.text.isNotEmpty
-                          ? '${_dateStartTextController.text} ${_timeStartTextController.text}'
-                          : 'Wybierz datę rozpoczęcia.',
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ]),
+                        const Icon(Icons.calendar_today, color: Colors.blue),
+                        const SizedBox(width: 8.0),
+                        Text(
+                          _dateStartTextController.text.isNotEmpty
+                              ? '${_dateStartTextController.text} ${_timeStartTextController.text}'
+                              : 'Wybierz datę rozpoczęcia.',
+                          style: const TextStyle(
+                            color: Colors.blue,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ]),
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
@@ -254,8 +261,8 @@ class AddEventView extends State<AddEventScreen> {
                             ? '${_dateEndTextController.text} ${_timeEndTextController.text}'
                             : 'Wybierz datę zakończenia.',
                         style: const TextStyle(
-                            color: Colors.blue,
-                            fontSize: 18,
+                          color: Colors.blue,
+                          fontSize: 18,
                         ),
                       ),
                     ],
@@ -292,15 +299,25 @@ class AddEventView extends State<AddEventScreen> {
                     const SizedBox(width: 16.0),
                     InkWell(
                       onTap: () async {
-                        Navigator.push(
+                        final selectedUsers = await Navigator.push<List<String>>(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AddEventFriendsListScreen(),
+                            builder: (context) => AddEventFriendsListScreen(
+                              requestList: _requestList,
+                              onRequestListChanged: (List<String> updatedList) {
+                                setState(() {
+                                  _requestList = updatedList;
+                                });
+                              },
+                            ),
                           ),
                         );
-                        setState(() {
-                          doneFriends = true;
-                        });
+                        if (selectedUsers != null && selectedUsers.isNotEmpty) {
+                          setState(() {
+                            _requestList = selectedUsers;
+                            doneFriends = true;
+                          });
+                        }
                       },
                       child: Column(
                         children: [
@@ -357,13 +374,21 @@ class AddEventView extends State<AddEventScreen> {
               return GeoPoint(latLng.latitude, latLng.longitude);
             }).toList();
 
-            eventRepository.createEvent(
-                _titleController.text,
-                _descriptionController.text,
-                selectedStartDateTime,
-                selectedEndDateTime,
-                int.parse(_maxParticipantsController.text),
-                geoPoints);
+            String? eventId;
+
+            try {
+              eventId = await eventRepository.createEvent(
+                  _titleController.text,
+                  _descriptionController.text,
+                  selectedStartDateTime,
+                  selectedEndDateTime,
+                  int.parse(_maxParticipantsController.text),
+                  geoPoints);
+            } catch (e) {
+              createSnackBarError("Błąd serwera!\nSpróbuj ponownie.", context);
+            } finally {
+              sendRequestToEvent(eventId!);
+            }
 
             Navigator.pop(context);
           }
@@ -381,5 +406,18 @@ class AddEventView extends State<AddEventScreen> {
     });
 
     createSnackBar('Trasa została zapisana.', context);
+  }
+
+  Future<void> sendRequestToEvent(String eventId) async {
+    try {
+      String? userId = await userRepository.getCurrentUserId();
+      eventParticipantsRepository.create(eventId);
+      for (var userId in _requestList) {
+        eventRequestRepository.createRequest(eventId, userId, true);
+      }
+      eventParticipantsRepository.addUserToEvent(userId!, eventId);
+    } catch (e) {
+      print("Error send request");
+    }
   }
 }

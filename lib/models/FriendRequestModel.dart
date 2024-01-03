@@ -1,12 +1,12 @@
 class FriendRequestModel {
   final String? id;
-  final String? asker;
-  final String? friend;
+  final String asker;
+  final String friend;
 
   const FriendRequestModel({
   this.id,
-  this.asker,
-  this.friend,
+  required this.asker,
+  required this.friend,
   });
 
   toJson() {

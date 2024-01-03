@@ -1,7 +1,7 @@
 
 class FriendsModel {
   final String? id;
-  final String? user;
+  final String user;
   final List<String?> friends;
 
   const FriendsModel({

@@ -3,6 +3,8 @@ import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 import 'package:tourpis/utils/color_utils.dart';
 
+import '../screens/friends/request/requests_screen.dart';
+
 Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
   return Drawer(
     backgroundColor: Colors.white,
@@ -73,6 +75,39 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          child: InkWell(
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RequestsScreen()),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: hexStringToColor("0B3963"),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    child: Icon(Icons.person_add, color: Colors.white),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Text(
+                      'Twoje zaproszenia',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         for (UserModel friend in friendsList)
           Container(
             margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -93,4 +128,5 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
     ),
   );
 }
-//todo odświeżanie znajomych
+//todo dodaj przycisk do akceptowania zaproszeń do eventów
+//todo wyświetlić liczbę zaproszeń do znajmych tutaj dodać tylko do repository funkcje zliczającą i ją wywołać tu

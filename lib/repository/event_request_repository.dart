@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourpis/models/EventModel.dart';
 import 'package:tourpis/models/EventRequestModel.dart';
+import 'package:tourpis/repository/user_repository.dart';
 
 class EventRequestRepository {
   final _db = FirebaseFirestore.instance;
@@ -10,9 +11,12 @@ class EventRequestRepository {
     await _db.collection('event_requests').doc().set(eventRequest.toJson());
   }
 
-  Future<List<EventModel>> getRequestsForUser(String userId) async {
+  Future<List<EventModel>> getRequestsForUser() async {
+
+    String? userId = await UserRepository().getCurrentUserId();
+
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await _db.collection('event_requests').where('userId', isEqualTo: userId).get();
+    await _db.collection('event_requests').where('userId', isEqualTo: userId!).get();
 
     List<EventModel> events = [];
 
@@ -21,6 +25,7 @@ class EventRequestRepository {
       EventModel? event = await getEventById(eventId);
 
       if (event != null) {
+        event.id = eventId;
         events.add(event);
       }
     }
@@ -37,5 +42,18 @@ class EventRequestRepository {
     } else {
       return null;
     }
+  }
+
+  Future<void> deleteRequest(String eventId, String userId) async {
+    await _db
+        .collection('event_requests')
+        .where('eventId', isEqualTo: eventId)
+        .where('userId', isEqualTo: userId)
+        .get()
+        .then((querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+    });
   }
 }

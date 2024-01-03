@@ -1,7 +1,7 @@
-import 'package:cloud_firestore_platform_interface/src/geo_point.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventModel {
-  final String? id;
+  String? id;
   final String owner;
   final String title;
   final String description;
@@ -11,7 +11,7 @@ class EventModel {
   final int participants;
   final List<GeoPoint> route;
 
-  const EventModel({
+  EventModel({
     this.id,
     required this.owner,
     required this.title,
@@ -25,6 +25,7 @@ class EventModel {
 
   toJson() {
     return {
+      "id": id,
       "owner": owner,
       "title": title,
       "description": description,
@@ -42,12 +43,12 @@ class EventModel {
       owner: json['owner'],
       title: json['title'],
       description: json['description'],
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
+      startDate: (json['startDate'] as Timestamp).toDate(),
+      endDate: (json['endDate'] as Timestamp).toDate(),
       capacity: json['capacity'],
       participants: json['participants'],
       route: (json['route'] as List<dynamic>)
-          .map((geoPoint) => GeoPoint(geoPoint['latitude'], geoPoint['longitude']))
+          .map((geoPoint) => GeoPoint(geoPoint.latitude, geoPoint.longitude))
           .toList(),
     );
   }

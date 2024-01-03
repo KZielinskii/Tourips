@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourpis/models/EventModel.dart';
 import 'package:tourpis/models/EventRequestModel.dart';
+import 'package:tourpis/repository/event_participants_repository.dart';
+import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';
 
 class EventRequestRepository {
@@ -55,5 +57,11 @@ class EventRequestRepository {
         doc.reference.delete();
       }
     });
+  }
+
+  Future<void> acceptRequest(String eventId, String userId) async {
+    await EventRepository().incrementParticipantsCount(eventId);
+    await deleteRequest(eventId, userId);
+    await EventParticipantsRepository().addUserToEvent(userId, eventId);
   }
 }

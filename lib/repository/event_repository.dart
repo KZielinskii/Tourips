@@ -38,4 +38,10 @@ class EventRepository {
       return null;
     }
   }
+
+  Future<void> incrementParticipantsCount(String eventId) async {
+    await _db.collection('events').doc(eventId).update({
+      'participants': FieldValue.increment(1),
+    });
+  }
 }

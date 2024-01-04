@@ -57,6 +57,67 @@ class EventRepository {
     }
   }
 
+  Future<List<EventModel>> getUserEvents() async {
+    try {
+      String? userId = await userRepository.getCurrentUserId();
+
+      if (userId != null) {
+        QuerySnapshot<Map<String, dynamic>> participantEventsSnapshot =
+        await _db.collection('event_participants').where('participants', arrayContains: userId).get();
+
+        List<EventModel> participantEvents = [];
+
+        for (var doc in participantEventsSnapshot.docs) {
+          String eventId = doc['eventId'];
+          EventModel? event = await getEventById(eventId);
+          if (event != null) {
+            participantEvents.add(event);
+          }
+        }
+
+        return participantEvents;
+      } else {
+        print('Błąd: Nie udało się pobrać ID użytkownika');
+        return [];
+      }
+    } catch (error) {
+      print('Error fetching user event: $error');
+      throw Exception('Error fetching user event');
+    }
+  }
+
+  Future<List<EventModel>> getOtherEvents() async {
+    try {
+      String? userId = await userRepository.getCurrentUserId();
+
+      if (userId != null) {
+        QuerySnapshot<Map<String, dynamic>> allEventsSnapshot =
+        await _db.collection('events').get();
+
+        QuerySnapshot<Map<String, dynamic>> participantEventsSnapshot =
+        await _db.collection('event_participants').where('participants', arrayContains: userId).get();
+
+        List<String> participantEventIds = participantEventsSnapshot.docs
+            .map((doc) => doc['eventId'].toString())
+            .toList();
+
+        List<EventModel> otherEvents = allEventsSnapshot.docs
+            .where((eventDoc) => !participantEventIds.contains(eventDoc.id))
+            .map((eventDoc) => EventModel.fromJson(eventDoc.data()))
+            .toList();
+
+        return otherEvents;
+      } else {
+        print('Błąd: Nie udało się pobrać ID użytkownika');
+        return [];
+      }
+    } catch (error) {
+      print('Error fetching other events: $error');
+      throw Exception('Error fetching other events');
+    }
+  }
+
+
   Future<EventModel?> getEventById(String eventId) async {
     DocumentSnapshot<Map<String, dynamic>> eventDoc =
     await _db.collection('events').doc(eventId).get();

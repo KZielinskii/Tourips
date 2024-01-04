@@ -33,7 +33,7 @@ class _HomeEventsPageState extends State<HomeEventsPage> {
     return RefreshIndicator(
       key: refreshIndicatorState,
       onRefresh: () async {
-        List<EventModel> refreshedEvents = await eventRepository.getAllEvents();
+        List<EventModel> refreshedEvents = await eventRepository.getUserEvents();
 
         setState(() {
           events = refreshedEvents;
@@ -41,7 +41,7 @@ class _HomeEventsPageState extends State<HomeEventsPage> {
       },
       child: FutureBuilder<List<EventModel>>(
         key: UniqueKey(),
-        future: eventRepository.getAllEvents(),
+        future: eventRepository.getUserEvents(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();

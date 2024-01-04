@@ -219,7 +219,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        drawer: buildDrawer(context, _friendsList),
         body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(colors: [

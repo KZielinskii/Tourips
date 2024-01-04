@@ -8,10 +8,34 @@ class FriendRequestRepository {
   final _db = FirebaseFirestore.instance;
   final UserRepository _userRepository = UserRepository();
 
-  Future<void> createRequest(String askerId, String friendId) async {
-    FriendRequestModel friendRequest = FriendRequestModel(asker: askerId, friend: friendId);
-    await _db.collection('requests').doc().set(friendRequest.toJson());
+  Future<bool> createRequest(String askerId, String friendId) async {
+    final existingRequest = await _db
+        .collection('requests')
+        .where('asker', isEqualTo: askerId)
+        .where('friend', isEqualTo: friendId)
+        .get();
+
+    final reverseExistingRequest = await _db
+        .collection('requests')
+        .where('asker', isEqualTo: friendId)
+        .where('friend', isEqualTo: askerId)
+        .get();
+
+    if (existingRequest.docs.isEmpty && reverseExistingRequest.docs.isEmpty) {
+      FriendRequestModel friendRequest = FriendRequestModel(
+        asker: askerId,
+        friend: friendId,
+      );
+
+      await _db.collection('requests').doc().set(friendRequest.toJson());
+      print('Friend request created successfully!');
+      return true;
+    } else {
+      print('Similar friend request already exists.');
+      return false;
+    }
   }
+
 
   Future<List<UserModel>> getAllRequestToUser() async {
     List<UserModel> allRequest = [];
@@ -24,7 +48,7 @@ class FriendRequestRepository {
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       FriendRequestModel requestModel = FriendRequestModel.fromJson(doc.data() as Map<String, dynamic>);
-      UserModel? user = await _userRepository.getUserByUid(requestModel.asker!);
+      UserModel? user = await _userRepository.getUserByUid(requestModel.asker);
       allRequest.add(user!);
     }
 
@@ -41,7 +65,7 @@ class FriendRequestRepository {
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
       FriendRequestModel requestModel = FriendRequestModel.fromJson(doc.data() as Map<String, dynamic>);
-      UserModel? user = await _userRepository.getUserByUid(requestModel.friend!);
+      UserModel? user = await _userRepository.getUserByUid(requestModel.friend);
       allRequest.add(user!);
     }
 

@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/models/UserModel.dart';
+import 'package:tourpis/repository/friends_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';
+import 'package:tourpis/widgets/widget.dart';
+import '../../models/FriendsModel.dart';
+import '../../repository/friend_request_repository.dart';
 import '../../utils/color_utils.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -19,6 +23,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   File? _image;
   UserModel? userModel;
   bool isLoading = true;
+  bool isFriend = true;
+  late String currentUserId;
 
   @override
   void initState() {
@@ -28,16 +34,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    userModel = await UserRepository().getUserByUid(widget.userId);
-
-    setState(() {
-      isLoading = false;
-    });
+    UserRepository userRepository = UserRepository();
+    currentUserId = (await userRepository.getCurrentUserId())!;
+    userModel = await userRepository.getUserByUid(widget.userId);
+    FriendsModel? friendsList = await FriendsRepository().getFriendsList();
+    List<String?>? friends = friendsList?.friends;
+    if(friends!.contains(widget.userId)) {
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isFriend = false;
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadUserProfileImage() async {
     Reference storageReference =
-    FirebaseStorage.instance.ref().child('images/${widget.userId}.png');
+        FirebaseStorage.instance.ref().child('images/${widget.userId}.png');
 
     try {
       _image = File((await storageReference.getDownloadURL()).toString());
@@ -101,12 +117,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             ),
                             child: _image == null
                                 ? const Center(
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.blueGrey,
-                                size: 128,
-                              ),
-                            )
+                                    child: Icon(
+                                      Icons.person,
+                                      color: Colors.blueGrey,
+                                      size: 128,
+                                    ),
+                                  )
                                 : null,
                           ),
                         ),
@@ -123,7 +139,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
                     _buildUserInformationCard(
                       "Login: ${isLoading ? 'Ładowanie...' : userModel!.login}",
                     ),
@@ -131,7 +146,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     _buildUserInformationCard(
                       "Email: ${isLoading ? 'Ładowanie...' : userModel!.email}",
                     ),
-                    // Add more user information fields as needed
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _handleFriendRequest,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 16),
+                        foregroundColor: Colors.white,
+                        backgroundColor: isFriend ? Colors.green : Colors.blue,
+                      ),
+                      child: Text(
+                        isFriend ? 'Na liście znajomych' : 'Dodaj do znajomych',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -140,6 +167,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleFriendRequest() async {
+    if(isFriend) {
+      createSnackBar("Użytkownik jest już twoim znajomym.", context);
+    } else {
+      try {
+        if(await FriendRequestRepository().createRequest(currentUserId, widget.userId)) {
+          createSnackBar("Wysłano zaproszenie", context);
+        } else {
+          createSnackBarError("Zaproszenie już istnieje!\nSprawdź zaproszenia do grona znajomych,\nlub poczekaj na odpowiedź użytkownika.", context);
+        }
+      } catch(e) {
+        createSnackBarError("Błąd serwera\nNie udało się wysłać zaproszenia.", context);
+      }
+    }
   }
 
   Widget _buildUserInformationCard(String information) {

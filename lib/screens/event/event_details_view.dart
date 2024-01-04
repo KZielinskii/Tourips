@@ -8,6 +8,7 @@ import '../../repository/event_participants_repository.dart';
 import '../../repository/user_repository.dart';
 import '../../utils/color_utils.dart';
 import '../map/display_map_screen.dart';
+import '../profile/user_profile_screen.dart';
 import 'event_details_screen.dart';
 
 class EventDetailsView extends State<EventDetailsScreen> {
@@ -171,8 +172,10 @@ class EventDetailsView extends State<EventDetailsScreen> {
                                       UserModel participant = snapshot.data!;
                                       return GestureDetector(
                                         onTap: () {
-                                          // todo
-                                          //Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(userId: participant.uid,),),);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => UserProfileScreen(participant.uid)),
+                                          );
                                         },
                                         child: Card(
                                           color: Colors.blue,

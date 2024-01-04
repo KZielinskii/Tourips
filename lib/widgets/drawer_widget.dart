@@ -1,5 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:tourpis/models/UserModel.dart';
+import 'package:tourpis/repository/event_request_repository.dart';
+import 'package:tourpis/repository/friend_request_repository.dart';
 import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 import 'package:tourpis/utils/color_utils.dart';
 
@@ -58,18 +61,50 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
                 color: hexStringToColor("0B3963"),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Row(
+              child: Stack(
+                alignment: Alignment.topRight,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    child: Icon(Icons.person_add, color: Colors.white),
+                  const Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        child: Icon(Icons.person_add, color: Colors.white),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Text(
+                          "Dodaj znajomych",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16),
-                    child: Text(
-                      'Dodaj znajomych',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                  FutureBuilder<int>(
+                    future: FriendRequestRepository().getRequestCountToUser(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return (snapshot.data ?? 0) > 0
+                            ? Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red,
+                            ),
+                            child: Text(
+                              snapshot.data.toString(),
+                              style: const TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          ),
+                        ) : Container();
+                      }
+                    },
                   ),
                 ],
               ),
@@ -91,18 +126,50 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
                 color: hexStringToColor("0B3963"),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Row(
+              child: Stack(
+                alignment: Alignment.topRight,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    child: Icon(Icons.add_location_alt_outlined, color: Colors.white),
+                  const Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        child: Icon(Icons.add_location_alt_outlined, color: Colors.white),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16),
+                        child: Text(
+                          "Dołącz do wydarzeń",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 16),
-                    child: Text(
-                      'Zaproszenia',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                  FutureBuilder<int>(
+                    future: EventRequestRepository().getCountRequestsForUser(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return (snapshot.data ?? 0) > 0
+                            ?  Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red,
+                            ),
+                            child: Text(
+                              snapshot.data.toString(),
+                              style: const TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          ),
+                        ): Container();
+                      }
+                    },
                   ),
                 ],
               ),
@@ -132,5 +199,3 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
     ),
   );
 }
-
-//todo wyświetlić liczbę zaproszeń do znajmych tutaj dodać tylko do repository funkcje zliczającą i ją wywołać tu

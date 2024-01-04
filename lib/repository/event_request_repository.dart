@@ -13,6 +13,14 @@ class EventRequestRepository {
     await _db.collection('event_requests').doc().set(eventRequest.toJson());
   }
 
+  Future<int> getCountRequestsForUser() async {
+    String? currentUserId = await UserRepository().getCurrentUserId();
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await _db.collection('event_requests').where('userId', isEqualTo: currentUserId).get();
+
+    return querySnapshot.size;
+  }
+
   Future<List<EventModel>> getRequestsForUser() async {
 
     String? userId = await UserRepository().getCurrentUserId();

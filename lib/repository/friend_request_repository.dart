@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourpis/models/FriendRequestModel.dart';
 import 'package:tourpis/repository/user_repository.dart';
@@ -36,6 +38,17 @@ class FriendRequestRepository {
     }
   }
 
+  Future<int> getRequestCountToUser() async {
+    String? currentUserId = await _userRepository.getCurrentUserId();
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('requests')
+        .where('friend', isEqualTo: currentUserId)
+        .get();
+
+    int count = querySnapshot.size;
+    return count;
+  }
 
   Future<List<UserModel>> getAllRequestToUser() async {
     List<UserModel> allRequest = [];

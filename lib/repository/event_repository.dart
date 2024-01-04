@@ -27,6 +27,8 @@ class EventRepository {
 
         DocumentReference eventRef = await _db.collection('events').add(event.toJson());
         String eventId = eventRef.id;
+        event.id = eventId;
+        await _db.collection('events').doc(eventId).update(event.toJson());
         print('Stworzono wydarzenie');
         return eventId;
       } else {
@@ -36,6 +38,22 @@ class EventRepository {
     } else {
       print('Błąd: Nie udało się pobrać ID użytkownika');
       return null;
+    }
+  }
+
+  Future<List<EventModel>> getAllEvents() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> eventsSnapshot =
+      await _db.collection('events').get();
+
+      List<EventModel> events = eventsSnapshot.docs
+          .map((eventDoc) => EventModel.fromJson(eventDoc.data()))
+          .toList();
+
+      return events;
+    } catch (error) {
+      print('Error fetching all events: $error');
+      throw Exception('Error fetching all events');
     }
   }
 

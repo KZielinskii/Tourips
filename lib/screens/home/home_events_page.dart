@@ -1,78 +1,68 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:tourpis/models/EventModel.dart';
 
+import '../../models/EventModel.dart';
+import '../../repository/event_repository.dart';
+import '../event/event_details_screen.dart';
 import 'event_card.dart';
 
-class HomeEventsPage extends StatelessWidget {
+class HomeEventsPage extends StatefulWidget {
   const HomeEventsPage({super.key});
 
-  void goToEventDetails(BuildContext context) {
-    //todo
-    return;
+  @override
+  _HomeEventsPageState createState() => _HomeEventsPageState();
+}
+
+class _HomeEventsPageState extends State<HomeEventsPage> {
+  final EventRepository eventRepository = EventRepository();
+  List<EventModel> events = [];
+
+  void goToEventDetails(BuildContext context, String eventId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EventDetailsScreen(eventId: eventId),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final GlobalKey<RefreshIndicatorState> refreshIndicatorState =
-    GlobalKey<RefreshIndicatorState>();
+        GlobalKey<RefreshIndicatorState>();
 
     return RefreshIndicator(
       key: refreshIndicatorState,
       onRefresh: () async {
-        // todo
+        List<EventModel> refreshedEvents = await eventRepository.getAllEvents();
+
+        setState(() {
+          events = refreshedEvents;
+        });
       },
-      child: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('events').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      child: FutureBuilder<List<EventModel>>(
+        key: UniqueKey(),
+        future: eventRepository.getAllEvents(),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
-            return Text('Wystąpił błąd: ${snapshot.error}');
+            return Text(
+                'Wystąpił błąd podczas przetwarzania danych: ${snapshot.error}');
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nie znaleziono wydarzeń'));
           } else {
-            try {
-              List<EventModel> events = snapshot.data!.docs.map((
-                  DocumentSnapshot document) {
-                Map<String, dynamic> data = document.data() as Map<
-                    String,
-                    dynamic>;
-                List<GeoPoint> route = data['route'] != null &&
-                    data['route'] is List
-                    ? (data['route'] as List).cast<GeoPoint>()
-                    : [];
+            events = snapshot.data!;
 
-                return EventModel(
-                  title: data['title'],
-                  description: data['description'],
-                  owner: data['owner'],
-                  startDate: (data['startDate'] as Timestamp).toDate(),
-                  endDate: (data['endDate'] as Timestamp).toDate(),
-                  capacity: data['capacity'],
-                  participants: data['participants'],
-                  route: route,
+            return ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                return GestureDetector(
+                  onTap: () => goToEventDetails(context, event.id!),
+                  child: EventCard(event: event),
                 );
-              }).toList();
-
-              return Column(
-                children: [
-                  if (events.isEmpty)
-                    const Center(child: Text('Nie znaleziono wydarzeń'))
-                  else
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: events.length,
-                        itemBuilder: (context, index) =>
-                            GestureDetector(
-                              onTap: () => goToEventDetails(context),
-                              child: EventCard(event: events.elementAt(index)),
-                            ),
-                      ),
-                    ),
-                ],
-              );
-            } catch (error) {
-              return Text('Wystąpił błąd podczas przetwarzania danych: $error');
-            }
+              },
+            );
           }
         },
       ),

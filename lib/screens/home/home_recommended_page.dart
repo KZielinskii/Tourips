@@ -5,11 +5,10 @@ import 'package:tourpis/models/EventModel.dart';
 import 'event_card.dart';
 
 class HomeRecommendedPage extends StatelessWidget {
-  const HomeRecommendedPage({Key? key}) : super(key: key);
+  const HomeRecommendedPage({super.key});
 
   void goToEventDetails(BuildContext context) {
-    //todo
-    return;
+   // Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(userId: participant.uid,),),);
   }
 
   @override

@@ -131,7 +131,7 @@ class HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: _selectedIndex == 0
-                  ? const HomeEventsPage()
+                  ? HomeEventsPage()
                   : const HomeRecommendedPage(),
             ),
           ],

@@ -59,58 +59,58 @@ class EventDetailsView extends State<EventDetailsScreen> {
               hexStringToColor("0B3963")
             ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-                MediaQuery.of(context).size.width * 0.05,
-                MediaQuery.of(context).size.height * 0.05,
-                MediaQuery.of(context).size.width * 0.05,
-                MediaQuery.of(context).size.height * 0.4
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (event.route.isNotEmpty) {
-                      List<LatLng> routeLatLng = event.route.map(geoPointToLatLng).toList();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DisplayMapScreen(
-                            routePoints: routeLatLng,
+          child: Center(
+            child: isLoading
+                ? const CircularProgressIndicator()
+                : Padding(
+              padding: const EdgeInsets.fromLTRB(
+                16.0,
+                16.0,
+                16.0,
+                16.0,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (event.route.isNotEmpty) {
+                        List<LatLng> routeLatLng = event.route.map(geoPointToLatLng).toList();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DisplayMapScreen(
+                              routePoints: routeLatLng,
+                            ),
                           ),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Brak punktów do wyświetlenia na mapie.'),
-                        ),
-                      );
-                    }
-                  },
-                  child: const Card(
-                    color: Colors.blue,
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Text(
-                          'Pokaż trasę na mapie',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Brak punktów do wyświetlenia na mapie.'),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Card(
+                      color: Colors.blue,
+                      child: Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            'Pokaż trasę na mapie',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                if (isLoading)
-                  const CircularProgressIndicator()
-                else
+                  const SizedBox(height: 16),
                   Card(
                     color: Colors.white,
                     elevation: 5.0,
@@ -174,7 +174,9 @@ class EventDetailsView extends State<EventDetailsScreen> {
                                         onTap: () {
                                           Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => UserProfileScreen(participant.uid)),
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserProfileScreen(participant.uid)),
                                           );
                                         },
                                         child: Card(
@@ -207,7 +209,8 @@ class EventDetailsView extends State<EventDetailsScreen> {
                       ),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -215,3 +218,4 @@ class EventDetailsView extends State<EventDetailsScreen> {
     );
   }
 }
+

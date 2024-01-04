@@ -1,14 +1,28 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/models/EventModel.dart';
 
+import '../../repository/event_repository.dart';
+import '../event/event_details_screen.dart';
 import 'event_card.dart';
 
-class HomeRecommendedPage extends StatelessWidget {
+class HomeRecommendedPage extends StatefulWidget {
   const HomeRecommendedPage({super.key});
 
-  void goToEventDetails(BuildContext context) {
-   // Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(userId: participant.uid,),),);
+  @override
+  _HomeRecommendedPageState createState() => _HomeRecommendedPageState();
+}
+
+class _HomeRecommendedPageState extends State<HomeRecommendedPage> {
+  final EventRepository eventRepository = EventRepository();
+  List<EventModel> events = [];
+
+  void goToEventDetails(BuildContext context, String eventId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EventDetailsScreen(eventId: eventId),
+      ),
+    );
   }
 
   @override
@@ -19,45 +33,35 @@ class HomeRecommendedPage extends StatelessWidget {
     return RefreshIndicator(
       key: refreshIndicatorState,
       onRefresh: () async {
-        // todo
+        List<EventModel> refreshedEvents = await eventRepository.getOtherEvents();
+
+        setState(() {
+          events = refreshedEvents;
+        });
       },
-      child: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('events').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      child: FutureBuilder<List<EventModel>>(
+        key: UniqueKey(),
+        future: eventRepository.getOtherEvents(),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
-            return Text('Wystąpił błąd: ${snapshot.error}');
+            return Text(
+                'Wystąpił błąd podczas przetwarzania danych: ${snapshot.error}');
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nie znaleziono wydarzeń'));
           } else {
-            List<EventModel> events = snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-              return EventModel(
-                title: data['title'],
-                description: data['description'],
-                owner: data['owner'],
-                startDate: (data['startDate'] as Timestamp).toDate(),
-                endDate: (data['endDate'] as Timestamp).toDate(),
-                capacity: data['capacity'],
-                participants: data['participants'],
-                route: data['route'],
-              );
-            }).toList();
+            events = snapshot.data!;
 
-            return Column(
-              children: [
-                if (events.isEmpty)
-                  const Center(child: Text('Nie znaleziono wydarzeń'))
-                else
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: events.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () => goToEventDetails(context),
-                        child: EventCard(event: events.elementAt(index)),
-                      ),
-                    ),
-                  ),
-              ],
+            return ListView.builder(
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                return GestureDetector(
+                  onTap: () => goToEventDetails(context, event.id!),
+                  child: EventCard(event: event),
+                );
+              },
             );
           }
         },

@@ -39,7 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 MediaQuery.of(context).size.width * 0.1,
                 MediaQuery.of(context).size.height * 0,
                 MediaQuery.of(context).size.width * 0.1,
-                MediaQuery.of(context).size.height * 0.2),
+                MediaQuery.of(context).size.height * 0.1),
             child: Column(
               children: <Widget>[
                 logoWidget("assets/images/logo_text.png"),

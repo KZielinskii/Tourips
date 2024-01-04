@@ -3,22 +3,25 @@ import 'package:flutter/material.dart';
 enum MyThemeKeys { LIGHT, DARK }
 
 class MyThemes {
-
   static final ThemeData lightTheme = ThemeData(
     primaryColor: const Color(0xff2F73B1),
-    appBarTheme: const AppBarTheme(color: Color(0xff0b3963),),
+    appBarTheme: const AppBarTheme(
+      color: Color(0xff0b3963),
+    ),
     textSelectionTheme: const TextSelectionThemeData(
       selectionColor: Colors.blueGrey,
       cursorColor: Color(0xff0b3963),
       selectionHandleColor: Color(0xff2F73B1),
     ),
-    backgroundColor: Colors.white,
     brightness: Brightness.light,
     highlightColor: Colors.white,
-    floatingActionButtonTheme:
-    const FloatingActionButtonThemeData (backgroundColor: Colors.blue,focusColor: Colors.blueAccent , splashColor: Colors.lightBlue),
-    colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
-
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Colors.blue,
+        focusColor: Colors.blueAccent,
+        splashColor: Colors.lightBlue),
+    colorScheme: ColorScheme.fromSwatch()
+        .copyWith(secondary: Colors.white)
+        .copyWith(background: const Color(0xff0b3963)),
   );
 
   static final ThemeData darkTheme = ThemeData(
@@ -26,7 +29,8 @@ class MyThemes {
     brightness: Brightness.dark,
     highlightColor: Colors.white,
     backgroundColor: Colors.black54,
-    textSelectionTheme: const TextSelectionThemeData(selectionColor: Colors.blueGrey),
+    textSelectionTheme:
+        const TextSelectionThemeData(selectionColor: Colors.blueGrey),
   );
 
   static ThemeData getThemeFromKey(MyThemeKeys themeKey) {

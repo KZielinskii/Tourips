@@ -233,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   MediaQuery.of(context).size.width * 0.05,
                   MediaQuery.of(context).size.height * 0.1,
                   MediaQuery.of(context).size.width * 0.05,
-                  MediaQuery.of(context).size.height * 0.4),
+                  MediaQuery.of(context).size.height * 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: SingleChildScrollView(

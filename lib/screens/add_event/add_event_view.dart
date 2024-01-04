@@ -129,7 +129,7 @@ class AddEventView extends State<AddEventScreen> {
             colors: [
               hexStringToColor("2F73B1"),
               hexStringToColor("2F73B1"),
-              hexStringToColor("1A4290"),
+              hexStringToColor("0B3963"),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -141,7 +141,7 @@ class AddEventView extends State<AddEventScreen> {
                 MediaQuery.of(context).size.width * 0.1,
                 MediaQuery.of(context).size.height * 0.1,
                 MediaQuery.of(context).size.width * 0.1,
-                MediaQuery.of(context).size.height * 0.4
+                MediaQuery.of(context).size.height * 0.1
             ),
             child: Column(
               children: [

@@ -39,6 +39,17 @@ class EventRepository {
     }
   }
 
+  Future<EventModel?> getEventById(String eventId) async {
+    DocumentSnapshot<Map<String, dynamic>> eventDoc =
+    await _db.collection('events').doc(eventId).get();
+
+    if (eventDoc.exists) {
+      return EventModel.fromJson(eventDoc.data()!);
+    } else {
+      return null;
+    }
+  }
+
   Future<void> incrementParticipantsCount(String eventId) async {
     await _db.collection('events').doc(eventId).update({
       'participants': FieldValue.increment(1),

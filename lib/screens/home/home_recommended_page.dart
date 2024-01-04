@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tourpis/models/EventModel.dart';
+import 'package:tourpis/screens/home/event_card_with_button.dart';
 
 import '../../repository/event_repository.dart';
+import '../../repository/event_request_repository.dart';
+import '../../repository/user_repository.dart';
+import '../../widgets/widget.dart';
 import '../event/event_details_screen.dart';
-import 'event_card.dart';
 
 class HomeRecommendedPage extends StatefulWidget {
   const HomeRecommendedPage({super.key});
@@ -15,6 +18,7 @@ class HomeRecommendedPage extends StatefulWidget {
 class _HomeRecommendedPageState extends State<HomeRecommendedPage> {
   final EventRepository eventRepository = EventRepository();
   List<EventModel> events = [];
+  Set<String> disabledJoinButtons = {};
 
   void goToEventDetails(BuildContext context, String eventId) {
     Navigator.push(
@@ -59,7 +63,8 @@ class _HomeRecommendedPageState extends State<HomeRecommendedPage> {
                 final event = events[index];
                 return GestureDetector(
                   onTap: () => goToEventDetails(context, event.id!),
-                  child: EventCard(event: event),
+                  child: EventCardWithButton(event: event, handleJoinRequest: () => handleJoinRequest(event),
+                    isButtonEnabled: !disabledJoinButtons.contains(event.id), ),
                 );
               },
             );
@@ -67,5 +72,22 @@ class _HomeRecommendedPageState extends State<HomeRecommendedPage> {
         },
       ),
     );
+  }
+
+  Future<void> handleJoinRequest(EventModel event) async {
+    try {
+      if (disabledJoinButtons.contains(event.id)) {
+        return;
+      }
+
+      String? userId = await UserRepository().getCurrentUserId();
+      await EventRequestRepository().createRequest(event.id.toString(), userId!, false);
+      setState(() {
+        disabledJoinButtons.add(event.id!);
+      });
+      createSnackBar("Wysłano prośbę o dołączenie do wydarzenia.", context);
+    } catch (e) {
+      createSnackBarError("Błąd prośby o dołączenie.", context);
+    }
   }
 }

@@ -5,18 +5,20 @@ import 'package:tourpis/repository/event_participants_repository.dart';
 import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';
 
+import '../models/UserModel.dart';
+
 class EventRequestRepository {
   final _db = FirebaseFirestore.instance;
 
   Future<void> createRequest(String eventId, String userId, bool ownerRequest) async {
-    EventRequestModel eventRequest = EventRequestModel(eventId: eventId, userId: userId, ownerRequest: true);
+    EventRequestModel eventRequest = EventRequestModel(eventId: eventId, userId: userId, ownerRequest: ownerRequest);
     await _db.collection('event_requests').doc().set(eventRequest.toJson());
   }
 
   Future<int> getCountRequestsForUser() async {
     String? currentUserId = await UserRepository().getCurrentUserId();
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await _db.collection('event_requests').where('userId', isEqualTo: currentUserId).get();
+    await _db.collection('event_requests').where('userId', isEqualTo: currentUserId).where('ownerRequest', isEqualTo: true).get();
 
     return querySnapshot.size;
   }
@@ -26,7 +28,7 @@ class EventRequestRepository {
     String? userId = await UserRepository().getCurrentUserId();
 
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await _db.collection('event_requests').where('userId', isEqualTo: userId!).get();
+    await _db.collection('event_requests').where('userId', isEqualTo: userId!).where('ownerRequest', isEqualTo: true).get();
 
     List<EventModel> events = [];
 
@@ -41,6 +43,25 @@ class EventRequestRepository {
     }
 
     return events;
+  }
+
+  Future<List<UserModel>> getRequestsForEvent(String eventId) async {
+
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await _db.collection('event_requests').where('eventId', isEqualTo: eventId).where('ownerRequest', isEqualTo: false).get();
+
+    List<UserModel> users = [];
+
+    for (QueryDocumentSnapshot<Map<String, dynamic>> doc in querySnapshot.docs) {
+      String userId = doc['userId'];
+      UserModel? asker = await UserRepository().getUserByUid(userId);
+
+      if (asker != null) {
+        users.add(asker);
+      }
+    }
+
+    return users;
   }
 
   Future<EventModel?> getEventById(String eventId) async {

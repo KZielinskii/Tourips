@@ -4,6 +4,7 @@ import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 import 'package:tourpis/utils/color_utils.dart';
 
 import '../screens/friends/request/requests_screen.dart';
+import '../screens/profile/user_profile_screen.dart';
 
 Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
   return Drawer(
@@ -94,12 +95,12 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    child: Icon(Icons.person_add, color: Colors.white),
+                    child: Icon(Icons.add_location_alt_outlined, color: Colors.white),
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 16),
                     child: Text(
-                      'Twoje zaproszenia',
+                      'Zaproszenia',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
@@ -119,8 +120,11 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
               leading: const Icon(Icons.person, color: Colors.white),
               title: Text(friend.login, style: const TextStyle(color: Colors.white),),
               onTap: () {
-                //todo profil użytkownika
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserProfileScreen(friend.uid)),
+                );
               },
             ),
           ),
@@ -128,5 +132,5 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
     ),
   );
 }
-//todo dodaj przycisk do akceptowania zaproszeń do eventów
+
 //todo wyświetlić liczbę zaproszeń do znajmych tutaj dodać tylko do repository funkcje zliczającą i ją wywołać tu

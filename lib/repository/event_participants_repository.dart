@@ -39,4 +39,20 @@ class EventParticipantsRepository {
       });
     }
   }
+
+  Future<List<String?>> getParticipantsByEventId(String eventId) async {
+    final eventDocRef = _db
+        .collection('event_participants')
+        .where('eventId', isEqualTo: eventId);
+
+    final eventSnapshot = await eventDocRef.get();
+
+    if (eventSnapshot.docs.isNotEmpty) {
+      EventParticipantsModel eventParticipants = EventParticipantsModel.fromJson(
+          eventSnapshot.docs.first.data());
+      return eventParticipants.participants;
+    } else {
+      return [];
+    }
+  }
 }

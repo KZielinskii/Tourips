@@ -5,7 +5,7 @@ import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/widgets/widget.dart';
 
 import '../../../models/EventModel.dart';
-import '../../event/EventDetailsScreen.dart';
+import '../../event/event_details_screen.dart';
 
 class EventRequestListItem extends StatelessWidget {
   final EventModel event;

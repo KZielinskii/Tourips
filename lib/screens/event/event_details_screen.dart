@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import 'EventDetailsView.dart';
+import 'event_details_view.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final String eventId;

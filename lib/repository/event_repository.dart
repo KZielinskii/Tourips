@@ -41,6 +41,29 @@ class EventRepository {
     }
   }
 
+  Future<void> deleteEvent(String eventId) async {
+    try {
+      await _db.collection('events').doc(eventId).delete();
+
+      await _db.collection('event_participants').where('eventId', isEqualTo: eventId).get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+
+      await _db.collection('event_requests').where('eventId', isEqualTo: eventId).get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+
+      print('Usunięto wydarzenie o ID: $eventId');
+    } catch (error) {
+      print('Error deleting event: $error');
+      throw Exception('Error deleting event');
+    }
+  }
+
   Future<List<EventModel>> getAllEvents() async {
     try {
       QuerySnapshot<Map<String, dynamic>> eventsSnapshot =

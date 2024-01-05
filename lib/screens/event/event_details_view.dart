@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +12,8 @@ import '../../models/UserModel.dart';
 import '../../repository/event_participants_repository.dart';
 import '../../repository/user_repository.dart';
 import '../../utils/color_utils.dart';
+import '../../widgets/widget.dart';
+import '../edit_event/edit_event_screen.dart';
 import '../map/display_map_screen.dart';
 import 'event_details_screen.dart';
 
@@ -175,7 +179,10 @@ class EventDetailsView extends State<EventDetailsScreen> {
                                     return Padding(
                                       key: ValueKey(user!.uid),
                                       padding: const EdgeInsets.all(8.0),
-                                      child: UserParticipantListItem(user: user, eventId: widget.eventId, isOwner: isOwner),
+                                      child: UserParticipantListItem(
+                                          user: user,
+                                          eventId: widget.eventId,
+                                          isOwner: isOwner),
                                     );
                                   },
                                 ),
@@ -185,9 +192,26 @@ class EventDetailsView extends State<EventDetailsScreen> {
                         ),
                         const SizedBox(height: 16),
                         if (isOwner)
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: requests.length,
+                            itemBuilder: (context, index) {
+                              final user = requests[index];
+                              return Padding(
+                                key: ValueKey(user.uid),
+                                padding: const EdgeInsets.all(8.0),
+                                child: UserRequestListItem(
+                                  user: user,
+                                  eventId: widget.eventId,
+                                ),
+                              );
+                            },
+                          ),
+                        const SizedBox(height: 16),
+                        if (isOwner)
                           ElevatedButton(
                             onPressed: () {
-                              //todo ekran edytowania
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EditEventScreen(eventId: widget.eventId))).then((value) {});
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -199,17 +223,17 @@ class EventDetailsView extends State<EventDetailsScreen> {
                           ),
                         const SizedBox(height: 16),
                         if (isOwner)
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: requests.length,
-                            itemBuilder: (context, index) {
-                              final user = requests[index];
-                              return Padding(
-                                key: ValueKey(user.uid),
-                                padding: const EdgeInsets.all(8.0),
-                                child: UserRequestListItem(user: user, eventId: widget.eventId,),
-                              );
+                          ElevatedButton(
+                            onPressed: () {
+                              deleteEvent();
                             },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Text(
+                              "Usuń Wydarzenie",
+                              style: TextStyle(fontSize: 18, color: Colors.red),
+                            ),
                           ),
                       ],
                     ),
@@ -222,8 +246,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
 
   Future<void> checkUserIsOwner() async {
     String? userId = await UserRepository().getCurrentUserId();
-    UserModel? user = await UserRepository().getUserByUid(userId!);
-    if (event.owner == user!.login) {
+    if (event.owner == userId) {
       loadEventRequests();
       setState(() {
         isOwner = true;
@@ -237,6 +260,76 @@ class EventDetailsView extends State<EventDetailsScreen> {
     for (UserModel? user in users) {
       requests.add(user!);
     }
-    setState(() {requests = requests;});
+    setState(() {
+      requests = requests;
+    });
+  }
+
+  Future<void> deleteEvent() async {
+    try {
+      bool confirmed = await showDeleteConfirmationDialog(context);
+
+      if (confirmed) {
+        await EventRepository().deleteEvent(widget.eventId);
+        setState(() {
+          Navigator.pop(context);
+          createSnackBar("Usunięto wydarzenie.", context);
+        });
+      }
+    } catch (e) {
+      setState(() {
+        createSnackBarError("Błąd serwera.", context);
+      });
+    }
+  }
+
+  Future<bool> showDeleteConfirmationDialog(BuildContext context) async {
+    Completer<bool> completer = Completer<bool>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Potwierdzenie",
+            style: TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            "Czy na pewno chcesz usunąć wydarzenie?",
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+                completer.complete(false);
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue),
+              ),
+              child: const Text(
+                "Anuluj",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+                completer.complete(true);
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red),
+              ),
+              child: const Text(
+                "Usuń",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+          backgroundColor: Colors.black87,
+        );
+      },
+    );
+    return completer.future;
   }
 }

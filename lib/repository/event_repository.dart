@@ -17,7 +17,7 @@ class EventRepository {
         EventModel event = EventModel(
           title: title,
           description: description,
-          owner: owner.login,
+          owner: ownerId,
           startDate: startDate,
           endDate: endDate,
           capacity: capacity,
@@ -38,6 +38,62 @@ class EventRepository {
     } else {
       print('Błąd: Nie udało się pobrać ID użytkownika');
       return null;
+    }
+  }
+
+  Future<void> updateEvent(
+      String eventId,
+      String title,
+      String description,
+      DateTime startDate,
+      DateTime endDate,
+      int capacity,
+      int participants,
+      List<GeoPoint> geoPoints,
+      String owner,
+      ) async {
+    try {
+      EventModel updatedEvent = EventModel(
+        id: eventId,
+        title: title,
+        description: description,
+        startDate: startDate,
+        endDate: endDate,
+        capacity: capacity,
+        participants: participants,
+        route: geoPoints,
+        owner: owner,
+      );
+
+      await _db.collection('events').doc(eventId).update(updatedEvent.toJson());
+
+      print('Zaktualizowano wydarzenie o ID: $eventId');
+    } catch (error) {
+      print('Error updating event: $error');
+      throw Exception('Error updating event');
+    }
+  }
+
+  Future<void> deleteEvent(String eventId) async {
+    try {
+      await _db.collection('events').doc(eventId).delete();
+
+      await _db.collection('event_participants').where('eventId', isEqualTo: eventId).get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+
+      await _db.collection('event_requests').where('eventId', isEqualTo: eventId).get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          doc.reference.delete();
+        }
+      });
+
+      print('Usunięto wydarzenie o ID: $eventId');
+    } catch (error) {
+      print('Error deleting event: $error');
+      throw Exception('Error deleting event');
     }
   }
 

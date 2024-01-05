@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/models/EventModel.dart';
 import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
+import 'package:tourpis/screens/chat/chat_screen.dart';
 import 'package:tourpis/screens/event/user_participant_list_item.dart';
 import 'package:tourpis/screens/event/user_request_list_item.dart';
 import '../../models/UserModel.dart';
@@ -176,14 +177,28 @@ class EventDetailsView extends State<EventDetailsScreen> {
                                   itemCount: participants.length,
                                   itemBuilder: (context, index) {
                                     final user = participants[index];
-                                    return Padding(
-                                      key: ValueKey(user!.uid),
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: UserParticipantListItem(
-                                          user: user,
-                                          eventId: widget.eventId,
-                                          isOwner: isOwner),
-                                    );
+                                    return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ChatScreen(
+                                                  receiverLogin:
+                                                      participants[index]!
+                                                          .login,
+                                                  receiverId:
+                                                      participants[index]!.uid),
+                                            ),
+                                          );
+                                        },
+                                        child: Padding(
+                                          key: ValueKey(user!.uid),
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: UserParticipantListItem(
+                                              user: user,
+                                              eventId: widget.eventId,
+                                              isOwner: isOwner),
+                                        ));
                                   },
                                 ),
                               ],
@@ -197,12 +212,24 @@ class EventDetailsView extends State<EventDetailsScreen> {
                             itemCount: requests.length,
                             itemBuilder: (context, index) {
                               final user = requests[index];
-                              return Padding(
-                                key: ValueKey(user.uid),
-                                padding: const EdgeInsets.all(8.0),
-                                child: UserRequestListItem(
-                                  user: user,
-                                  eventId: widget.eventId,
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatScreen(
+                                          receiverLogin: requests[index].login,
+                                          receiverId: requests[index].uid),
+                                    ),
+                                  );
+                                },
+                                child: Padding(
+                                  key: ValueKey(user.uid),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: UserRequestListItem(
+                                    user: user,
+                                    eventId: widget.eventId,
+                                  ),
                                 ),
                               );
                             },
@@ -211,7 +238,12 @@ class EventDetailsView extends State<EventDetailsScreen> {
                         if (isOwner)
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EditEventScreen(eventId: widget.eventId))).then((value) {});
+                              Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => EditEventScreen(
+                                              eventId: widget.eventId)))
+                                  .then((value) {});
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),

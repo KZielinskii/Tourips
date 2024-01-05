@@ -45,7 +45,7 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wybierz trasę'),
+        title: const Text('Wybierz trasę', style: TextStyle(color: Colors.white),),
       ),
       body: GoogleMap(
         onMapCreated: _onMapCreated,

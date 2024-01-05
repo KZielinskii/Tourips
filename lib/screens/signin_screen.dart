@@ -16,53 +16,92 @@ class _SignInScreenState extends State<SignInScreen> {
 
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-      hexStringToColor("2F73B1"),
-      hexStringToColor("2F73B1"),
-      hexStringToColor("0B3963")
-    ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-                MediaQuery.of(context).size.width * 0.1,
-                MediaQuery.of(context).size.height * 0.1,
-                MediaQuery.of(context).size.width * 0.1,
-                MediaQuery.of(context).size.height * 0.1
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  hexStringToColor("2F73B1"),
+                  hexStringToColor("2F73B1"),
+                  hexStringToColor("0B3963")
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-            child: Column(
-              children: <Widget>[
-                logoWidget("assets/images/logo.png"),
-                const SizedBox(
-                  height: 30,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  MediaQuery.of(context).size.width * 0.1,
+                  MediaQuery.of(context).size.height * 0.1,
+                  MediaQuery.of(context).size.width * 0.1,
+                  MediaQuery.of(context).size.height * 0.1,
                 ),
-                reusableTextField("Wprowadź email", Icons.person_outline, false, _emailTextController, true),
-                const SizedBox(
-                  height: 30,
+                child: Column(
+                  children: <Widget>[
+                    logoWidget("assets/images/logo.png"),
+                    const SizedBox(height: 30),
+                    reusableTextField(
+                      "Wprowadź email",
+                      Icons.person_outline,
+                      false,
+                      _emailTextController,
+                      true,
+                    ),
+                    const SizedBox(height: 30),
+                    reusableTextField(
+                      "Wprowadź hasło",
+                      Icons.lock_outline,
+                      true,
+                      _passwordTextController,
+                      true,
+                    ),
+                    const SizedBox(height: 30),
+                    singInButton(context, true, () {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                        email: _emailTextController.text,
+                        password: _passwordTextController.text,
+                      )
+                          .then((value) {
+                        print("Sign In");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                        );
+                      }).onError((error, stackTrace) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                        createSnackBarError(
+                          "Nieprawidłowy login lub hasło",
+                          context,
+                        );
+                        print("Error ${error.toString()}");
+                      });
+                    }),
+                    singUpOption(),
+                  ],
                 ),
-                reusableTextField("Wprowadź hasło", Icons.lock_outline, true, _passwordTextController, true),
-                const SizedBox(
-                  height: 30,
-                ),
-                singInButton(context, true, () {
-                  FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailTextController.text, password: _passwordTextController.text).then((value) {
-                    print("Sign In");
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-                  }).onError((error, stackTrace) {
-                    createSnackBarError("Nieprawidołowy login lub hasło", context);
-                    print("Error ${error.toString()}");
-                  });
-                }),
-                singUpOption()
-              ],
+              ),
             ),
           ),
-        ),
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }

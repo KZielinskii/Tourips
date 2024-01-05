@@ -4,22 +4,22 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
-import 'package:tourpis/screens/event/user_list_item_view.dart';
+import 'package:tourpis/screens/event/user_request_list_item_view.dart';
 import 'package:tourpis/widgets/widget.dart';
 
 import '../../../../models/UserModel.dart';
 
-class UserRequestsListItem extends StatefulWidget {
+class UserRequestListItem extends StatefulWidget {
   final UserModel user;
   final String eventId;
 
-  const UserRequestsListItem({super.key, required this.user, required this.eventId});
+  const UserRequestListItem({super.key, required this.user, required this.eventId});
 
   @override
-  _UserRequestsListItemState createState() => _UserRequestsListItemState();
+  _UserRequestListItemState createState() => _UserRequestListItemState();
 }
 
-class _UserRequestsListItemState extends State<UserRequestsListItem> {
+class _UserRequestListItemState extends State<UserRequestListItem> {
 
   final FriendRequestRepository friendRequestRepository = FriendRequestRepository();
   bool isButtonEnabled = true;

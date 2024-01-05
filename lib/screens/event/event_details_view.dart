@@ -4,20 +4,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/models/EventModel.dart';
 import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
-import 'package:tourpis/screens/event/user_list_item.dart';
+import 'package:tourpis/screens/event/user_participant_list_item.dart';
+import 'package:tourpis/screens/event/user_request_list_item.dart';
 import '../../models/UserModel.dart';
 import '../../repository/event_participants_repository.dart';
 import '../../repository/user_repository.dart';
 import '../../utils/color_utils.dart';
 import '../map/display_map_screen.dart';
-import '../profile/user_profile_screen.dart';
 import 'event_details_screen.dart';
 
 class EventDetailsView extends State<EventDetailsScreen> {
   late final EventModel event;
   bool isOwner = false;
   bool isLoading = true;
-  List<String?> participants = [];
+  List<UserModel?> participants = [];
   List<UserModel> requests = [];
 
   @override
@@ -171,50 +171,11 @@ class EventDetailsView extends State<EventDetailsScreen> {
                                   shrinkWrap: true,
                                   itemCount: participants.length,
                                   itemBuilder: (context, index) {
-                                    String? participantId = participants[index];
-                                    return FutureBuilder<UserModel?>(
-                                      future: UserRepository()
-                                          .getUserByUid(participantId!),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.done) {
-                                          if (snapshot.hasData) {
-                                            UserModel participant =
-                                                snapshot.data!;
-                                            return GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          UserProfileScreen(
-                                                              participant.uid)),
-                                                );
-                                              },
-                                              child: Card(
-                                                color: Colors.blue,
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      16.0),
-                                                  child: Center(
-                                                    child: Text(
-                                                      participant.login,
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            return const SizedBox.shrink();
-                                          }
-                                        } else {
-                                          return const CircularProgressIndicator();
-                                        }
-                                      },
+                                    final user = participants[index];
+                                    return Padding(
+                                      key: ValueKey(user!.uid),
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: UserParticipantListItem(user: user, eventId: widget.eventId, isOwner: isOwner),
                                     );
                                   },
                                 ),
@@ -246,7 +207,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
                               return Padding(
                                 key: ValueKey(user.uid),
                                 padding: const EdgeInsets.all(8.0),
-                                child: UserRequestsListItem(user: user, eventId: widget.eventId,),
+                                child: UserRequestListItem(user: user, eventId: widget.eventId,),
                               );
                             },
                           ),

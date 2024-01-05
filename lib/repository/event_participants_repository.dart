@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourpis/models/EventParticipantsModel.dart';
+import 'package:tourpis/repository/user_repository.dart';
+
+import '../models/UserModel.dart';
 
 class EventParticipantsRepository {
   final _db = FirebaseFirestore.instance;
@@ -40,7 +43,7 @@ class EventParticipantsRepository {
     }
   }
 
-  Future<List<String?>> getParticipantsByEventId(String eventId) async {
+  Future<List<UserModel?>> getParticipantsByEventId(String eventId) async {
     final eventDocRef = _db
         .collection('event_participants')
         .where('eventId', isEqualTo: eventId);
@@ -50,7 +53,13 @@ class EventParticipantsRepository {
     if (eventSnapshot.docs.isNotEmpty) {
       EventParticipantsModel eventParticipants = EventParticipantsModel.fromJson(
           eventSnapshot.docs.first.data());
-      return eventParticipants.participants;
+      List<UserModel?> participants = [];
+      List<String?> participantId = eventParticipants.participants;
+      for(String? id in participantId) {
+        UserModel? user = await UserRepository().getUserByUid(id!);
+        participants.add(user);
+      }
+      return participants;
     } else {
       return [];
     }

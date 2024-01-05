@@ -2,24 +2,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tourpis/widgets/widget.dart';
 
-import '../add_event/add_event_view.dart';
+import '../../widgets/widget.dart';
 
-
-const LatLng startPosition = LatLng(52, 20);
 const Duration updateInterval = Duration(seconds: 5);
 
-class MapScreen extends StatefulWidget {
-  final AddEventView addEventView;
+class EditMapScreen extends StatefulWidget {
+  final List<LatLng> initialPoints;
+  final Function(List<LatLng>) onSaveRoute;
 
-  const MapScreen({super.key, required this.addEventView});
+  const EditMapScreen({super.key, required this.initialPoints, required this.onSaveRoute});
 
   @override
-  _MapScreenState createState() => _MapScreenState();
+  _EditMapScreenState createState() => _EditMapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _EditMapScreenState extends State<EditMapScreen> {
   late GoogleMapController mapController;
   Set<Polyline> _polylines = {};
   Map<String, Marker> _markers = {};
@@ -33,6 +31,8 @@ class _MapScreenState extends State<MapScreen> {
     _locationUpdateTimer = Timer.periodic(updateInterval, (Timer timer) {
       _updateCurrentLocation();
     });
+    _points.addAll(widget.initialPoints);
+    _drawInitialPoints();
   }
 
   @override
@@ -52,8 +52,8 @@ class _MapScreenState extends State<MapScreen> {
         polylines: _polylines,
         markers: _markers.values.toSet(),
         onTap: _onMapTap,
-        initialCameraPosition: const CameraPosition(
-          target: startPosition,
+        initialCameraPosition: CameraPosition(
+          target: widget.initialPoints.isNotEmpty ? widget.initialPoints.first : const LatLng(0, 0),
           zoom: 10.0,
         ),
       ),
@@ -89,18 +89,31 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  void _drawInitialPoints() {
+    for (int i = 0; i < widget.initialPoints.length; i++) {
+      addMarker(
+        'point${i + 1}',
+        widget.initialPoints[i],
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+      );
+    }
+    _calculateAndDrawRoute();
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
       mapController = controller;
+      _drawInitialPoints();
     });
   }
 
   void _onMapTap(LatLng location) {
     setState(() {
       addMarker(
-          'point${_markers.length + 1}',
-          location,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure));
+        'point${_markers.length + 1}',
+        location,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+      );
       _points.add(location);
       _calculateAndDrawRoute();
     });
@@ -192,15 +205,11 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _saveRoute() async {
-    if(_points.isEmpty) {
-      createSnackBarError('Nie wybrano żandego punktu!', context);
-    }
-    else {
-      widget.addEventView.doneMap = true;
-      widget.addEventView.setPoints(_points);
+    if (_points.isEmpty) {
+      createSnackBarError('Nie wybrano żadnego punktu!', context);
+    } else {
+      widget.onSaveRoute(_points);
       Navigator.pop(context);
     }
-
   }
 }
-

@@ -8,6 +8,7 @@ import 'package:tourpis/repository/user_repository.dart';
 import '../../../utils/color_utils.dart';
 import '../../../widgets/widget.dart';
 import '../../models/EventModel.dart';
+import 'edit_map_screen.dart';
 
 class EditEventScreen extends StatefulWidget {
   final String eventId;
@@ -73,10 +74,17 @@ class _EditEventScreenState extends State<EditEventScreen> {
         _selectedStartTime = TimeOfDay.fromDateTime(event.startDate);
         _selectedEndDate = event.endDate;
         _selectedEndTime = TimeOfDay.fromDateTime(event.endDate);
+        _points = convertGeoPointsToLatLng(event.route);
       });
     } catch (error) {
       print('Error loading event details: $error');
     }
+  }
+
+  List<LatLng> convertGeoPointsToLatLng(List<GeoPoint> geoPoints) {
+    return geoPoints
+        .map((geoPoint) => LatLng(geoPoint.latitude, geoPoint.longitude))
+        .toList();
   }
 
   String _formatDate(DateTime dateTime) {
@@ -240,7 +248,34 @@ class _EditEventScreenState extends State<EditEventScreen> {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                // ... other UI elements as needed
+                ElevatedButton(
+                  onPressed: () async {
+                    await Navigator.push<List<LatLng>>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditMapScreen(
+                          initialPoints: _points,
+                          onSaveRoute: (List<LatLng> editedRoute) {
+                            setState(() {
+                              _points = editedRoute;
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.map, color: Colors.blue),
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Edytuj trasę',
+                        style: TextStyle(color: Colors.blue, fontSize: 18),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -273,7 +308,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
               return;
             }
 
-            if (event.participants > int.parse(_maxParticipantsController.text)) {
+            if (event.participants >
+                int.parse(_maxParticipantsController.text)) {
               createSnackBarError(
                 'Zapisało się za dużo uczestników by zmniejszyć\npojemność wydarzenia.',
                 context,
@@ -322,7 +358,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
       setState(() {
         _selectedStartDate = pickedDate;
         _dateStartTextController.text =
-        "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
 
       TimeOfDay? pickedTime = await showTimePicker(
@@ -334,7 +370,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
         setState(() {
           _selectedStartTime = pickedTime;
           _timeStartTextController.text =
-          "${pickedTime.hour}:${pickedTime.minute}";
+              "${pickedTime.hour}:${pickedTime.minute}";
         });
       }
     }
@@ -352,7 +388,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
       setState(() {
         _selectedEndDate = pickedDate;
         _dateEndTextController.text =
-        "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
+            "${pickedDate.day}.${pickedDate.month}.${pickedDate.year}";
       });
 
       TimeOfDay? pickedTime = await showTimePicker(
@@ -364,10 +400,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
         setState(() {
           _selectedEndTime = pickedTime;
           _timeEndTextController.text =
-          "${pickedTime.hour}:${pickedTime.minute}";
+              "${pickedTime.hour}:${pickedTime.minute}";
         });
       }
     }
   }
-
 }

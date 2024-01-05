@@ -246,8 +246,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
 
   Future<void> checkUserIsOwner() async {
     String? userId = await UserRepository().getCurrentUserId();
-    UserModel? user = await UserRepository().getUserByUid(userId!);
-    if (event.owner == user!.login) {
+    if (event.owner == userId) {
       loadEventRequests();
       setState(() {
         isOwner = true;

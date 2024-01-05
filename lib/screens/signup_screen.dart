@@ -64,7 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: 30,
                 ),
                 singInButton(context, false, () async {
-                  if (await correctPasswordAndLogin()) {
+                  if (await correctPassword()) {
                     FirebaseAuth.instance
                         .createUserWithEmailAndPassword(
                             email: _emailTextController.text,
@@ -124,11 +124,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Future<bool> correctPasswordAndLogin() async {
-    if (await userRepository.checkIfLoginExists(_loginTextController.text)) {
-      createSnackBarError("Login już jest zajęty.", context);
-      return false;
-    }
+  Future<bool> correctPassword() async {
     if (_passwordTextController.text != _passwordRepeatTextController.text) {
       createSnackBarError("Hasła nie są takie same." , context);
       return false;

@@ -100,8 +100,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Potwierdzenie"),
-          content: const Text("Czy napewno zapisać nowy login?"),
+          title: const Text("Potwierdzenie", style: TextStyle(color: Colors.white),),
+          content: const Text("Czy napewno zapisać nowy login?",  style: TextStyle(color: Colors.white),),
           actions: [
             TextButton(
               onPressed: () async {
@@ -110,7 +110,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _toggleEditingLogin();
                 Navigator.of(context).pop();
               },
-              child: const Text("Tak"),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue),
+              ),
+              child: const Text(
+                "Tak",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             TextButton(
               onPressed: () async {
@@ -118,9 +124,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _toggleEditingLogin();
                 Navigator.of(context).pop();
               },
-              child: const Text("Nie"),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red),
+              ),
+              child: const Text(
+                "Nie",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-          ],
+          ],backgroundColor: Colors.black87,
         );
       },
     );

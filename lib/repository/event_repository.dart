@@ -17,7 +17,7 @@ class EventRepository {
         EventModel event = EventModel(
           title: title,
           description: description,
-          owner: owner.login,
+          owner: ownerId,
           startDate: startDate,
           endDate: endDate,
           capacity: capacity,

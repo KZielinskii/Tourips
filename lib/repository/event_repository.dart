@@ -41,6 +41,39 @@ class EventRepository {
     }
   }
 
+  Future<void> updateEvent(
+      String eventId,
+      String title,
+      String description,
+      DateTime startDate,
+      DateTime endDate,
+      int capacity,
+      int participants,
+      List<GeoPoint> geoPoints,
+      String owner,
+      ) async {
+    try {
+      EventModel updatedEvent = EventModel(
+        id: eventId,
+        title: title,
+        description: description,
+        startDate: startDate,
+        endDate: endDate,
+        capacity: capacity,
+        participants: participants,
+        route: geoPoints,
+        owner: owner,
+      );
+
+      await _db.collection('events').doc(eventId).update(updatedEvent.toJson());
+
+      print('Zaktualizowano wydarzenie o ID: $eventId');
+    } catch (error) {
+      print('Error updating event: $error');
+      throw Exception('Error updating event');
+    }
+  }
+
   Future<void> deleteEvent(String eventId) async {
     try {
       await _db.collection('events').doc(eventId).delete();

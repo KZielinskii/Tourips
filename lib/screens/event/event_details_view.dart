@@ -13,6 +13,7 @@ import '../../repository/event_participants_repository.dart';
 import '../../repository/user_repository.dart';
 import '../../utils/color_utils.dart';
 import '../../widgets/widget.dart';
+import '../edit_event/edit_event_screen.dart';
 import '../map/display_map_screen.dart';
 import 'event_details_screen.dart';
 
@@ -210,7 +211,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
                         if (isOwner)
                           ElevatedButton(
                             onPressed: () {
-                              //todo ekran edytowania
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => EditEventScreen(eventId: widget.eventId))).then((value) {});
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),

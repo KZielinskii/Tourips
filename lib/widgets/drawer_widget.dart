@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
+import 'package:tourpis/screens/chat/chat_screen.dart';
 import 'package:tourpis/screens/friends/add_friends/users_screen.dart';
 import 'package:tourpis/utils/color_utils.dart';
 
 import '../screens/friends/request/requests_screen.dart';
-import '../screens/profile/user_profile_screen.dart';
 
 Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
   return Drawer(
@@ -190,7 +190,7 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UserProfileScreen(friend.uid)),
+                  MaterialPageRoute(builder: (context) => ChatScreen(receiverLogin: friend.login, receiverId: friend.uid,)),
                 );
               },
             ),

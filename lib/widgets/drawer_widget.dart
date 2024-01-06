@@ -198,4 +198,4 @@ Widget buildDrawer(BuildContext context, List<UserModel> friendsList) {
       ],
     ),
   );
-}
+} // todo aktualizacja

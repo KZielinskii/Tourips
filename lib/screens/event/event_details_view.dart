@@ -16,6 +16,7 @@ import '../../utils/color_utils.dart';
 import '../../widgets/widget.dart';
 import '../edit_event/edit_event_screen.dart';
 import '../map/display_map_screen.dart';
+import '../payment/payment_screen.dart';
 import 'event_details_screen.dart';
 
 class EventDetailsView extends State<EventDetailsScreen> {
@@ -84,44 +85,66 @@ class EventDetailsView extends State<EventDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            if (event.route.isNotEmpty) {
-                              List<LatLng> routeLatLng =
-                                  event.route.map(geoPointToLatLng).toList();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DisplayMapScreen(
-                                    routePoints: routeLatLng,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PaymentScreen(eventId: widget.eventId,),
+                                    ),
+                                  );
+                                });
+                              },
+                              child: Column(
+                                children: [
+                                  iconButton(Icons.monetization_on_outlined, false),
+                                  const SizedBox(height: 8.0),
+                                  const Text(
+                                    'Rozliczanie',
+                                    style: TextStyle(color: Colors.white),
                                   ),
-                                ),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'Brak punktów do wyświetlenia na mapie.'),
-                                ),
-                              );
-                            }
-                          },
-                          child: const Card(
-                            color: Colors.blue,
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Center(
-                                child: Text(
-                                  'Pokaż trasę na mapie',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                ],
                               ),
                             ),
-                          ),
+                            const SizedBox(width: 16.0),
+                            InkWell(
+                              onTap: () {
+                                if (event.route.isNotEmpty) {
+                                  List<LatLng> routeLatLng =
+                                  event.route.map(geoPointToLatLng).toList();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DisplayMapScreen(
+                                        routePoints: routeLatLng,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Brak punktów do wyświetlenia na mapie.'),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Column(
+                                children: [
+                                  iconButton(Icons.map_sharp, false),
+                                  const SizedBox(height: 8.0),
+                                  const Text(
+                                    'Mapa',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         Card(

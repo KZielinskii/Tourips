@@ -6,16 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/screens/home/home_events_page.dart';
 import 'package:tourpis/screens/home/home_recommended_page.dart';
 import 'package:tourpis/utils/color_utils.dart';
-import 'package:tourpis/widgets/drawer_widget.dart';
 
 import '../../models/UserModel.dart';
+import '../../repository/event_request_repository.dart';
+import '../../repository/friend_request_repository.dart';
 import '../../repository/friends_repository.dart';
 import '../add_event/add_event_screen.dart';
+import '../chat/chat_screen.dart';
+import '../friends/add_friends/users_screen.dart';
+import '../friends/request/requests_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_screen.dart';
 
 class HomeScreenState extends State<HomeScreen> {
-
   final FriendsRepository _friendsRepository = FriendsRepository();
 
   late List<UserModel> _friendsList = [];
@@ -42,7 +45,7 @@ class HomeScreenState extends State<HomeScreen> {
     });
 
     Reference storageReference =
-    FirebaseStorage.instance.ref().child('images/${user.uid}.png');
+        FirebaseStorage.instance.ref().child('images/${user.uid}.png');
 
     try {
       _image = File((await storageReference.getDownloadURL()).toString());
@@ -73,7 +76,218 @@ class HomeScreenState extends State<HomeScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      drawer: buildDrawer(context, _friendsList),
+      drawer: Drawer(
+        backgroundColor: Colors.white,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: hexStringToColor("2F73B1"),
+              ),
+              child: const Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Lista znajomych',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: InkWell(
+                onTap: () async {
+                  Navigator.pop(context);
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const UsersScreen()),
+                  );
+                  _loadFriendsList();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: hexStringToColor("0B3963"),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      const Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                            child: Icon(Icons.person_add, color: Colors.white),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text(
+                              "Dodaj znajomych",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      FutureBuilder<int>(
+                        future:
+                            FriendRequestRepository().getRequestCountToUser(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return (snapshot.data ?? 0) > 0
+                                ? Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.red,
+                                      ),
+                                      child: Text(
+                                        snapshot.data.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.white),
+                                      ),
+                                    ),
+                                  )
+                                : Container();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const RequestsScreen()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: hexStringToColor("0B3963"),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      const Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                            child: Icon(Icons.add_location_alt_outlined,
+                                color: Colors.white),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text(
+                              "Dołącz do wydarzeń",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      FutureBuilder<int>(
+                        future:
+                            EventRequestRepository().getCountRequestsForUser(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            return (snapshot.data ?? 0) > 0
+                                ? Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.red,
+                                      ),
+                                      child: Text(
+                                        snapshot.data.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.white),
+                                      ),
+                                    ),
+                                  )
+                                : Container();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            for (UserModel friend in _friendsList)
+              Container(
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                decoration: BoxDecoration(
+                  color: hexStringToColor("2F73B1"),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.person, color: Colors.white),
+                  title: Text(
+                    friend.login,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                                receiverLogin: friend.login,
+                                receiverId: friend.uid,
+                              )),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -117,7 +331,8 @@ class HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const ProfileScreen()),
                       );
                     },
                     child: CircleAvatar(
@@ -157,7 +372,6 @@ class HomeScreenState extends State<HomeScreen> {
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
         showUnselectedLabels: true,
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

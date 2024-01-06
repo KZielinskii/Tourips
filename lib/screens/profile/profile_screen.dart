@@ -7,9 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tourpis/models/UserModel.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/screens/signin_screen.dart';
-import '../../repository/friends_repository.dart';
 import '../../utils/color_utils.dart';
-import '../../widgets/drawer_widget.dart';
 import '../../widgets/widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -26,8 +24,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserModel? userModel;
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final FriendsRepository _friendsRepository = FriendsRepository();
-  late List<UserModel> _friendsList = [];
   bool _isEditingLogin = false;
 
   @override
@@ -35,12 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _loadUserProfileImage();
     _loadUserData();
-    _loadFriendsList();
-  }
-
-  Future<void> _loadFriendsList() async {
-    _friendsList = await _friendsRepository.loadFriendsList();
-    setState(() {});
   }
 
   Future<void> _loadUserData() async {

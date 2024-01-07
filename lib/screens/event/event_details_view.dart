@@ -16,7 +16,7 @@ import '../../utils/color_utils.dart';
 import '../../widgets/widget.dart';
 import '../edit_event/edit_event_screen.dart';
 import '../map/display_map_screen.dart';
-import '../payment/payment_screen.dart';
+import '../payment/payment_home_screen.dart';
 import 'event_details_screen.dart';
 
 class EventDetailsView extends State<EventDetailsScreen> {
@@ -94,7 +94,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => PaymentScreen(eventId: widget.eventId,),
+                                      builder: (context) => PaymentHomeScreen(eventId: widget.eventId,),
                                     ),
                                   );
                                 });

@@ -1,9 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:http/http.dart' as http;
+import 'package:tourpis/models/PaymentsModel.dart';
+import 'package:tourpis/models/UserModel.dart';
+import 'package:tourpis/repository/user_repository.dart';
+import 'package:tourpis/screens/payment/payment_list_item.dart';
+import 'package:tourpis/widgets/widget.dart';
+
+import '../../repository/payments_repository.dart';
 
 class PaymentScreen extends StatefulWidget {
   final String eventId;
@@ -15,77 +17,55 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  Map<String, dynamic>? paymentIntent;
-  late String amount;
+  late List<PaymentListItem> items = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadList();
+  }
+
+  Future<void> _loadList() async {
+    String? currentUser = await UserRepository().getCurrentUserId();
+    List<PaymentsModel> list =
+        await PaymentsRepository().getPaymentsByEventId(widget.eventId);
+    for (var i in list) {
+      UserModel? user = await UserRepository().getUserByUid(i.paidById);
+      PaymentListItem newItem = PaymentListItem(
+          title: i.title,
+          login: user!.login,
+          amount: "${i.amount} zł",
+          color: Colors.white,
+          id: i.id,
+          ownerId: i.paidById,
+          currentUserId: currentUser!,
+      );
+      items.add(newItem);
+    }
+    setState(() {
+      isLoading = false;
+      createSnackBar("(Przytrzymaj by usunąć wpis)", context);
+    });
+  }
+
+  Future<void> _refreshList() async {
+    setState(() {
+      isLoading = true;
+      items.clear();
+    });
+    await _loadList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Płatności",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            stripeMakePayment();
-          },
-          child: const Text("Zapłać"),
-        ),
+    return RefreshIndicator(
+      onRefresh: _refreshList,
+      child: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+        children: items,
       ),
     );
-  }
-
-  Future<void> stripeMakePayment() async {
-    try {
-      paymentIntent = await createPaymentIntent('500', 'PLN');
-
-      var gpay = const PaymentSheetGooglePay(
-        merchantCountryCode: "PL",
-        currencyCode: "PLN",
-        testEnv: true,
-      );
-      await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-        paymentIntentClientSecret: paymentIntent!["client_secret"],
-        style: ThemeMode.dark,
-        merchantDisplayName: "Kacper",
-        googlePay: gpay,
-      ));
-      displayPaymentSheet();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  displayPaymentSheet() async {
-    try {
-      await Stripe.instance.presentPaymentSheet();
-    } on Exception catch (e) {
-      print(e.toString());
-    }
-  }
-
-  createPaymentIntent(String amount, String currency) async {
-    try {
-      Map<String, dynamic> body = {
-        'amount': amount,
-        'currency': currency,
-      };
-
-      var response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body,
-      );
-      return json.decode(response.body);
-    } catch (err) {
-      throw Exception(err.toString());
-    }
   }
 }

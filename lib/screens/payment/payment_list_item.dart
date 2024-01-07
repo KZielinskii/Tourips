@@ -166,6 +166,7 @@ class PaymentListItem extends StatelessWidget {
                 if(ownerId == currentUserId) {
                   PaymentsRepository().deletePaymentById(id);
                   Navigator.of(context).pop();
+                  createSnackBar("Usunięto $title", context);
                 } else {
                   Navigator.of(context).pop();
                   createSnackBarError("Tylko osoba która płaciła może usunąć wpis.", context);

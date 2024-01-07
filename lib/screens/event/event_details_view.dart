@@ -64,7 +64,9 @@ class EventDetailsView extends State<EventDetailsScreen> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      body: Container(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          :  Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
           hexStringToColor("2F73B1"),
@@ -73,9 +75,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
         ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: SingleChildScrollView(
           child: Center(
-            child: isLoading
-                ? const CircularProgressIndicator()
-                : Padding(
+            child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                       16.0,
                       16.0,

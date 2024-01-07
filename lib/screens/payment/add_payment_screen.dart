@@ -199,6 +199,9 @@ class AddPaymentView extends State<AddPaymentScreen> {
         onPressed: () async {
           String title = _titleController.text;
           String amount = _amountController.text;
+          if(amount.contains(',')) {
+            amount = amount.replaceAll(',', '.');
+          }
 
           if (title.isEmpty || amount.isEmpty || selectedParticipants.isEmpty) {
             createSnackBarError(

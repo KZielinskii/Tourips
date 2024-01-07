@@ -23,6 +23,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
   late final EventModel event;
   bool isOwner = false;
   bool isLoading = true;
+  bool isOnEvent = false;
   List<UserModel?> participants = [];
   List<UserModel> requests = [];
 
@@ -88,7 +89,7 @@ class EventDetailsView extends State<EventDetailsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            InkWell(
+                            if (isOnEvent)InkWell(
                               onTap: () {
                                 setState(() {
                                   Navigator.push(
@@ -306,6 +307,13 @@ class EventDetailsView extends State<EventDetailsScreen> {
       setState(() {
         isOwner = true;
       });
+    }
+    for (var user in participants) {
+      if(user?.uid == userId) {
+        setState(() {
+          isOnEvent = true;
+        });
+      }
     }
   }
 

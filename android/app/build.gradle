@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.tourpis"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -41,7 +41,7 @@ android {
     }
 
     defaultConfig {
-       applicationId "com.example.tourpis"
+        applicationId "com.example.tourpis"
         minSdkVersion 21
         multiDexEnabled true
         targetSdkVersion 34

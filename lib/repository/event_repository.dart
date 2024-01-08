@@ -165,7 +165,7 @@ class EventRepository {
           String eventId = doc['eventId'];
           EventModel? event = await getEventById(eventId);
 
-          if (event != null && event.startDate.isAfter(currentDate)) {
+          if (event != null && event.endDate.isAfter(currentDate)) {
             participantEvents.add(event);
           }
         }

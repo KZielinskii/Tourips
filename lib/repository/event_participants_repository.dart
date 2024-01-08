@@ -31,7 +31,6 @@ class EventParticipantsRepository {
   Future<void> removeUserFromEvent(String userId, String eventId) async {
     final eventDocRef =
     _db.collection('event_participants').where('eventId', isEqualTo: eventId);
-
     final eventSnapshot = await eventDocRef.get();
 
     if (eventSnapshot.docs.isNotEmpty) {

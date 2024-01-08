@@ -8,6 +8,7 @@ import 'package:tourpis/screens/event/user_request_list_item_view.dart';
 import 'package:tourpis/widgets/widget.dart';
 
 import '../../../../models/UserModel.dart';
+import '../../models/EventModel.dart';
 
 class UserRequestListItem extends StatefulWidget {
   final UserModel user;
@@ -72,18 +73,38 @@ class _UserRequestListItemState extends State<UserRequestListItem> {
 
   Future<void> acceptRequest(String uid) async {
     try {
-      if(isButtonEnabled) {
-        await EventRequestRepository().acceptRequest(widget.eventId, uid);
-        setState(() {
-          isButtonEnabled = false;
-          createSnackBar("Pomyślnie dodano do wydarzenia.", context);
-        });
-      }
-
+      checkAndAcceptRequest(uid);
     } catch (e) {
       setState(() {
         createSnackBarError("Błąd serwera.", context);
       });
     }
+  }
+
+  Future<void> checkAndAcceptRequest(String uid) async {
+    try {
+      if (await updateAndCheckRequest(widget.eventId)) {
+        if(isButtonEnabled) {
+          await EventRequestRepository().acceptRequest(widget.eventId, uid);
+          setState(() {
+            isButtonEnabled = false;
+            createSnackBar("Pomyślnie dodano do wydarzenia.", context);
+          });
+        }
+      } else {
+        createSnackBarError(
+            "Wydarzenie osiągneło już maksymalną\nliczbę osób.", context);
+      }
+    } catch (e) {
+      print("Error server request.");
+    }
+  }
+
+  Future<bool> updateAndCheckRequest(String eventId) async {
+    EventModel? event = await EventRequestRepository().getEventById(eventId);
+    print(event!.capacity);
+    print((event!.participants));
+
+    return event!.capacity > event.participants;
   }
 }

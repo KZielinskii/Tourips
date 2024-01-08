@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/event_participants_repository.dart';
+import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
 import 'package:tourpis/screens/event/user_participant_list_item_view.dart';
 import 'package:tourpis/widgets/widget.dart';
@@ -83,6 +84,7 @@ class _UserParticipantListItemState extends State<UserParticipantListItem> {
 
         if (confirmed) {
           await EventParticipantsRepository().removeUserFromEvent(uid, widget.eventId);
+          await EventRepository().decrementParticipantsCount(widget.eventId);
           setState(() {
             isButtonEnabled = false;
             createSnackBar("Usunięto użytkownika z wydarzenia.", context);

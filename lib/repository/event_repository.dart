@@ -190,4 +190,10 @@ class EventRepository {
       'participants': FieldValue.increment(1),
     });
   }
+
+  Future<void> decrementParticipantsCount(String eventId) async {
+    await _db.collection('events').doc(eventId).update({
+      'participants': FieldValue.increment(-1),
+    });
+  }
 }

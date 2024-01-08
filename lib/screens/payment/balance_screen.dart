@@ -89,7 +89,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
 
       items.add(newItem);
     }
-
+    
     setState(() {
       isLoading = false;
     });

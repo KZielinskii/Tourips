@@ -113,20 +113,25 @@ class EventRepository {
     }
   }
 
-  Future<List<EventModel>> getUserEvents() async {
+  Future<List<EventModel>> getUserEventsEnded() async {
     try {
       String? userId = await userRepository.getCurrentUserId();
 
       if (userId != null) {
+        DateTime currentDate = DateTime.now();
+
         QuerySnapshot<Map<String, dynamic>> participantEventsSnapshot =
-        await _db.collection('event_participants').where('participants', arrayContains: userId).get();
+        await _db.collection('event_participants')
+            .where('participants', arrayContains: userId)
+            .get();
 
         List<EventModel> participantEvents = [];
 
         for (var doc in participantEventsSnapshot.docs) {
           String eventId = doc['eventId'];
           EventModel? event = await getEventById(eventId);
-          if (event != null) {
+
+          if (event != null && event.startDate.isBefore(currentDate)) {
             participantEvents.add(event);
           }
         }
@@ -142,23 +147,65 @@ class EventRepository {
     }
   }
 
+  Future<List<EventModel>> getUserEvents() async {
+    try {
+      String? userId = await userRepository.getCurrentUserId();
+
+      if (userId != null) {
+        DateTime currentDate = DateTime.now();
+
+        QuerySnapshot<Map<String, dynamic>> participantEventsSnapshot =
+        await _db.collection('event_participants')
+            .where('participants', arrayContains: userId)
+            .get();
+
+        List<EventModel> participantEvents = [];
+
+        for (var doc in participantEventsSnapshot.docs) {
+          String eventId = doc['eventId'];
+          EventModel? event = await getEventById(eventId);
+
+          if (event != null && event.endDate.isAfter(currentDate)) {
+            participantEvents.add(event);
+          }
+        }
+
+        return participantEvents;
+      } else {
+        print('Błąd: Nie udało się pobrać ID użytkownika');
+        return [];
+      }
+    } catch (error) {
+      print('Error fetching user event: $error');
+      throw Exception('Error fetching user event');
+    }
+  }
+
+
   Future<List<EventModel>> getOtherEvents() async {
     try {
       String? userId = await userRepository.getCurrentUserId();
 
       if (userId != null) {
+        DateTime currentDate = DateTime.now();
+
         QuerySnapshot<Map<String, dynamic>> allEventsSnapshot =
-        await _db.collection('events').get();
+        await _db.collection('events')
+            .where('endDate', isGreaterThanOrEqualTo: currentDate)
+            .get();
 
         QuerySnapshot<Map<String, dynamic>> participantEventsSnapshot =
-        await _db.collection('event_participants').where('participants', arrayContains: userId).get();
+        await _db.collection('event_participants')
+            .where('participants', arrayContains: userId)
+            .get();
 
         List<String> participantEventIds = participantEventsSnapshot.docs
             .map((doc) => doc['eventId'].toString())
             .toList();
 
         List<EventModel> otherEvents = allEventsSnapshot.docs
-            .where((eventDoc) => !participantEventIds.contains(eventDoc.id))
+            .where((eventDoc) =>
+        !participantEventIds.contains(eventDoc.id))
             .map((eventDoc) => EventModel.fromJson(eventDoc.data()))
             .toList();
 
@@ -172,6 +219,7 @@ class EventRepository {
       throw Exception('Error fetching other events');
     }
   }
+
 
 
   Future<EventModel?> getEventById(String eventId) async {

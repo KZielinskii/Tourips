@@ -46,7 +46,7 @@ class _UserListItemState extends State<UserListItem> {
             snapshot.data != null) {
           return UserListItemView(
             image: NetworkImage(snapshot.data!.path),
-            buttonText: "Dodaj znajomego",
+            buttonText: "Wyślij zaproszenie",
             onPressed: () {
               sendRequest(widget.user.uid);
             },
@@ -56,7 +56,7 @@ class _UserListItemState extends State<UserListItem> {
         } else {
           return UserListItemView(
             image: const AssetImage("assets/images/no_image.png"),
-            buttonText: "Dodaj znajomego",
+            buttonText: "Wyślij zaproszenie",
             onPressed: () {
               sendRequest(widget.user.uid);
             },

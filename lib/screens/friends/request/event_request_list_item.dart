@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/widgets/widget.dart';
@@ -18,7 +17,7 @@ class EventRequestListItem extends StatelessWidget {
       {super.key,
       required this.event,
       required this.onUpdate,
-      required this.context});
+      required this.context,});
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +48,6 @@ class EventRequestListItem extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                "Organizator: ${event.owner}",
-                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               Text(
@@ -97,7 +91,8 @@ class EventRequestListItem extends StatelessWidget {
   void navigateToEventDetailsScreen(String eventId) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventDetailsScreen(eventId: eventId)),
+      MaterialPageRoute(
+          builder: (context) => EventDetailsScreen(eventId: eventId)),
     );
   }
 

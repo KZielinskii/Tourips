@@ -16,6 +16,7 @@ import '../chat/chat_screen.dart';
 import '../friends/add_friends/users_screen.dart';
 import '../friends/request/requests_screen.dart';
 import '../profile/profile_screen.dart';
+import 'archive_screen.dart';
 import 'home_screen.dart';
 
 class HomeScreenState extends State<HomeScreen> {
@@ -252,6 +253,47 @@ class HomeScreenState extends State<HomeScreen> {
                                 : Container();
                           }
                         },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ArchiveScreen()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: hexStringToColor("0B3963"),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Stack(
+                    children: [
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 16),
+                            child: Icon(Icons.unarchive,
+                                color: Colors.white),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Text(
+                              "Archiwum",
+                              style:
+                              TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

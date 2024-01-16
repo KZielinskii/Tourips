@@ -12,6 +12,9 @@ Future<void> main() async {
 
   Stripe.publishableKey = 'pk_test_51OVMbUGRgwR2xYrTbuWKyFwCdHLlyXy6L1r8WDbUzqb9t54tiVUsJzJ8qkWtYiHfNLGeERticsRRyLwwRajSPdfG00hXFSofgq';
   await dotenv.load(fileName: "assets/.env");
+  Stripe.merchantIdentifier = 'merchant.flutter.stripe.Tourips';
+  Stripe.urlScheme = 'flutterstripe';
+  await Stripe.instance.applySettings();
 
   try {
     await Firebase.initializeApp(

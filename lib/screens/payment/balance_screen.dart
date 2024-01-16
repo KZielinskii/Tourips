@@ -12,7 +12,6 @@ import '../../models/UserModel.dart';
 import '../../repository/payments_repository.dart';
 import '../../repository/user_repository.dart';
 
-
 class BalanceScreen extends StatefulWidget {
   final String eventId;
 
@@ -40,18 +39,19 @@ class _BalanceScreenState extends State<BalanceScreen> {
     String? currentUser = await UserRepository().getCurrentUserId();
     List<PaymentsModel> list =
     await PaymentsRepository().getPaymentsByEventId(widget.eventId);
-    List<UserModel?> participants = await EventParticipantsRepository().getParticipantsByEventId(widget.eventId);
+    List<UserModel?> participants =
+    await EventParticipantsRepository().getParticipantsByEventId(widget.eventId);
     for (var user in participants) {
       double paid = 0;
       double toPay = 0;
 
-      for(var i in list) {
-        if(user?.uid == i.paidById) {
+      for (var i in list) {
+        if (user?.uid == i.paidById) {
           paid += double.parse(i.amount);
         }
 
         for (var j in i.theyWillPayId) {
-          if(j == user?.uid) {
+          if (j == user?.uid) {
             toPay += (double.parse(i.amount)) / i.theyWillPayId.length;
           }
         }
@@ -60,7 +60,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
       total = double.parse(total.toStringAsFixed(2));
 
       PaymentListItem newItem;
-      if(total >= 0) {
+      if (total >= 0) {
         newItem = PaymentListItem(
           title: user!.login,
           login: "Nie wymaga działań.",
@@ -80,7 +80,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
           ownerId: user.uid,
           currentUserId: currentUser!,
         );
-        if(user.uid == currentUser) {
+        if (user.uid == currentUser) {
           double amountDouble = double.parse(total.toString());
           amountDouble = amountDouble * -100;
           amount = amountDouble.toInt().toString();
@@ -89,7 +89,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
 
       items.add(newItem);
     }
-    
+
     setState(() {
       isLoading = false;
     });
@@ -120,12 +120,14 @@ class _BalanceScreenState extends State<BalanceScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: ElevatedButton(
-            onPressed: () {
-              stripeMakePayment();
+            onPressed: () async {
+              await stripeMakePayment();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-              minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 50)),
+              backgroundColor:
+              MaterialStateProperty.all<Color>(Colors.white),
+              minimumSize:
+              MaterialStateProperty.all<Size>(const Size(double.infinity, 50)),
             ),
             child: const Text(
               'Zapłać',
@@ -133,35 +135,37 @@ class _BalanceScreenState extends State<BalanceScreen> {
             ),
           ),
         ),
-
       ],
     );
   }
 
-
   Future<void> stripeMakePayment() async {
     try {
-      paymentIntent = await createPaymentIntent();
+      await createPaymentIntent();
 
       var gpay = const PaymentSheetGooglePay(
         merchantCountryCode: "PL",
         currencyCode: "PLN",
         testEnv: true,
       );
+
       await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret: paymentIntent!["client_secret"],
-            style: ThemeMode.dark,
-            merchantDisplayName: "Kacper",
-            googlePay: gpay,
-          ));
-      displayPaymentSheet();
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: paymentIntent!["client_secret"],
+          style: ThemeMode.dark,
+          merchantDisplayName: "Tourips",
+          googlePay: gpay,
+        ),
+      );
+
+
+      await displayPaymentSheet();
     } catch (e) {
       print(e.toString());
     }
   }
 
-  displayPaymentSheet() async {
+  Future<void> displayPaymentSheet() async {
     try {
       print(amount);
       await Stripe.instance.presentPaymentSheet();
@@ -170,7 +174,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
     }
   }
 
-  createPaymentIntent() async {
+  Future<void> createPaymentIntent() async {
     try {
       Map<String, dynamic> body = {
         'amount': amount,
@@ -185,7 +189,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
         },
         body: body,
       );
-      return json.decode(response.body);
+      paymentIntent = json.decode(response.body);
     } catch (err) {
       throw Exception(err.toString());
     }

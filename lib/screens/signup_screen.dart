@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tourpis/repository/stripe_customer_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';
 import 'package:tourpis/screens/signin_screen.dart';
 
@@ -16,6 +17,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  StripeCustomerRepository stripeCustomerRepository = StripeCustomerRepository();
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _passwordRepeatTextController =
       TextEditingController();
@@ -80,6 +82,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           String uid = userCredential.user!.uid;
                           userRepository.createUser(_loginTextController.text,
                               _emailTextController.text, uid);
+
+                          stripeCustomerRepository.createCustomer(email: _emailTextController.text);
 
                           print("Created New Account");
                           Navigator.push(

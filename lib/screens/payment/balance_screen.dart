@@ -1,17 +1,15 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:http/http.dart' as http;
+import 'package:tourpis/models/StripeCustomer.dart';
 import 'package:tourpis/repository/event_participants_repository.dart';
+import 'package:tourpis/repository/stripe_customer_repository.dart';
 import 'package:tourpis/screens/payment/payment_list_item.dart';
 
 import '../../models/PaymentsModel.dart';
 import '../../models/UserModel.dart';
 import '../../repository/payments_repository.dart';
 import '../../repository/user_repository.dart';
-
 
 class BalanceScreen extends StatefulWidget {
   final String eventId;
@@ -23,9 +21,11 @@ class BalanceScreen extends StatefulWidget {
 }
 
 class _BalanceScreenState extends State<BalanceScreen> {
-  Map<String, dynamic>? paymentIntent;
+  StripeCustomerRepository stripeCustomerRepository = StripeCustomerRepository();
   late String amount;
-  late String currentUser;
+  late String emailUser;
+  late String emailReceiver;
+  late String currentUserId;
 
   late List<PaymentListItem> items = [];
   bool isLoading = true;
@@ -34,24 +34,31 @@ class _BalanceScreenState extends State<BalanceScreen> {
   void initState() {
     super.initState();
     _loadList();
+
   }
 
   Future<void> _loadList() async {
     String? currentUser = await UserRepository().getCurrentUserId();
+    currentUserId = currentUser!;
+    UserModel? userModel = await UserRepository().getUserByUid(currentUser);
+    emailUser = userModel!.email;
+
+
     List<PaymentsModel> list =
     await PaymentsRepository().getPaymentsByEventId(widget.eventId);
-    List<UserModel?> participants = await EventParticipantsRepository().getParticipantsByEventId(widget.eventId);
+    List<UserModel?> participants =
+    await EventParticipantsRepository().getParticipantsByEventId(widget.eventId);
     for (var user in participants) {
       double paid = 0;
       double toPay = 0;
 
-      for(var i in list) {
-        if(user?.uid == i.paidById) {
+      for (var i in list) {
+        if (user?.uid == i.paidById) {
           paid += double.parse(i.amount);
         }
 
         for (var j in i.theyWillPayId) {
-          if(j == user?.uid) {
+          if (j == user?.uid) {
             toPay += (double.parse(i.amount)) / i.theyWillPayId.length;
           }
         }
@@ -60,7 +67,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
       total = double.parse(total.toStringAsFixed(2));
 
       PaymentListItem newItem;
-      if(total >= 0) {
+      if (total >= 0) {
         newItem = PaymentListItem(
           title: user!.login,
           login: "Nie wymaga działań.",
@@ -68,7 +75,7 @@ class _BalanceScreenState extends State<BalanceScreen> {
           color: Colors.green,
           id: "0",
           ownerId: user.uid,
-          currentUserId: currentUser!,
+          currentUserId: currentUser,
         );
       } else {
         newItem = PaymentListItem(
@@ -78,18 +85,18 @@ class _BalanceScreenState extends State<BalanceScreen> {
           color: Colors.red,
           id: "0",
           ownerId: user.uid,
-          currentUserId: currentUser!,
+          currentUserId: currentUser,
         );
-        if(user.uid == currentUser) {
+        if (user.uid == currentUser) {
           double amountDouble = double.parse(total.toString());
-          amountDouble = amountDouble * -100;
+          amountDouble = -amountDouble;
           amount = amountDouble.toInt().toString();
         }
       }
 
       items.add(newItem);
     }
-    
+
     setState(() {
       isLoading = false;
     });
@@ -120,12 +127,14 @@ class _BalanceScreenState extends State<BalanceScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
           child: ElevatedButton(
-            onPressed: () {
-              stripeMakePayment();
+            onPressed: () async {
+              await stripeMakePayment();
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-              minimumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 50)),
+              backgroundColor:
+              MaterialStateProperty.all<Color>(Colors.white),
+              minimumSize:
+              MaterialStateProperty.all<Size>(const Size(double.infinity, 50)),
             ),
             child: const Text(
               'Zapłać',
@@ -133,61 +142,57 @@ class _BalanceScreenState extends State<BalanceScreen> {
             ),
           ),
         ),
-
       ],
     );
   }
 
-
   Future<void> stripeMakePayment() async {
     try {
-      paymentIntent = await createPaymentIntent();
+      StripeCustomer? stripeCustomer = await StripeCustomerRepository().getCustomerByEmail(emailUser);
+      await stripeCustomerRepository.initStripePayment(amount: int.parse(amount), stripeCustomer: stripeCustomer!);
+      await Stripe.instance.presentPaymentSheet();
+      findAndPayUsers();
 
-      var gpay = const PaymentSheetGooglePay(
-        merchantCountryCode: "PL",
-        currencyCode: "PLN",
-        testEnv: true,
-      );
-      await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret: paymentIntent!["client_secret"],
-            style: ThemeMode.dark,
-            merchantDisplayName: "Kacper",
-            googlePay: gpay,
-          ));
-      displayPaymentSheet();
     } catch (e) {
       print(e.toString());
     }
   }
 
-  displayPaymentSheet() async {
-    try {
-      print(amount);
-      await Stripe.instance.presentPaymentSheet();
-    } on Exception catch (e) {
-      print(e.toString());
+  Future<void> findAndPayUsers() async {
+    int toPay = int.parse(amount);
+    for(var item in items) {
+      String amountToPay = item.amount.substring(0, item.amount.length - 5);
+      if(int.parse(amountToPay) > 0 && toPay > 0) {
+        if(toPay > int.parse(amountToPay)) {
+          UserModel? userModel = await UserRepository().getUserByUid(item.ownerId);
+          StripeCustomer? stripeCustomer = await StripeCustomerRepository().getCustomerByEmail(userModel!.email);
+          await stripeCustomerRepository.topUpBalance(amount: int.parse(amountToPay), stripeCustomer: stripeCustomer!);
+          await stripeCustomerRepository.giveMoneyToUser(userModel.email, int.parse(amountToPay));
+          removeDebt(userModel.uid, amountToPay);
+        } else {
+          UserModel? userModel = await UserRepository().getUserByUid(item.ownerId);
+          StripeCustomer? stripeCustomer = await StripeCustomerRepository().getCustomerByEmail(userModel!.email);
+          await stripeCustomerRepository.topUpBalance(amount: toPay, stripeCustomer: stripeCustomer!);
+          await stripeCustomerRepository.giveMoneyToUser(userModel.email, toPay);
+          removeDebt(userModel.uid, toPay.toString());
+        }
+      }
     }
   }
 
-  createPaymentIntent() async {
+  Future<void> removeDebt(String? id, String amountToPay) async {
     try {
-      Map<String, dynamic> body = {
-        'amount': amount,
-        'currency': 'PLN',
-      };
-
-      var response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body,
+      List<String> list = [];
+      list.add(id!);
+      await PaymentsRepository().create(
+        widget.eventId,
+        "Zwrot kosztów",
+        currentUserId,
+        amountToPay,
+        list,
       );
-      return json.decode(response.body);
-    } catch (err) {
-      throw Exception(err.toString());
+    } catch (e) {
+      print(e);
     }
   }
 }

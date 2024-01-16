@@ -104,10 +104,15 @@ class _ChatView extends State<ChatScreen> {
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: Container(
         padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
+        decoration: (data['senderId'] == firebase.currentUser!.uid)
+            ? BoxDecoration(
+                color: Colors.blueGrey,
+                borderRadius: BorderRadius.circular(8.0),
+              )
+            : BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
         child: Text(
           data['message'],
           style: const TextStyle(
@@ -118,14 +123,11 @@ class _ChatView extends State<ChatScreen> {
     );
   }
 
-
   Widget _buildMessageList() {
     FirebaseAuth firebase = FirebaseAuth.instance;
     return StreamBuilder(
         stream: _chatRepository.getMesseges(
-            widget.receiverId,
-            firebase.currentUser!.uid
-        ),
+            widget.receiverId, firebase.currentUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text("Błąd ${snapshot.error}");
@@ -142,8 +144,6 @@ class _ChatView extends State<ChatScreen> {
                 .map((document) => _buildMessageItem(document))
                 .toList(),
           );
-        }
-    );
+        });
   }
-
 }

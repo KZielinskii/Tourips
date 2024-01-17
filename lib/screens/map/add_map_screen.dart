@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/widgets/widget.dart';
+import 'package:http/http.dart' as http;
 
 import '../add_event/add_event_screen.dart';
 
@@ -106,16 +109,46 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void addMarker(String id, LatLng location, {required BitmapDescriptor icon}) {
+  Future<void> addMarker(String id, LatLng location, {required BitmapDescriptor icon}) async {
+    String attractionInfo = await getNearestAttractionInfo(location);
+
     var marker = Marker(
       markerId: MarkerId(id),
       position: location,
-      infoWindow: InfoWindow(title: location.toString()),
+      infoWindow: InfoWindow(title: attractionInfo),
       draggable: true,
       icon: icon,
       onDragEnd: (newPosition) => _onMarkerDragEnd(id, newPosition),
     );
     _markers[id] = marker;
+  }
+
+  Future<String> getNearestAttractionInfo(LatLng location) async {
+    const String apiKey = 'AIzaSyAR_51lpB8C9jjvZrrs0P-ASYrWhJaB5vk';
+
+    const String baseUrl =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+
+    final String locationString =
+        '${location.latitude},${location.longitude}';
+    const String radius = '1000';
+
+    final String url =
+        '$baseUrl?location=$locationString&radius=$radius&type=tourist_attraction&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (data.containsKey('results') && data['results'].isNotEmpty) {
+        return data['results'][0]['name'];
+      } else {
+        return 'Brak informacji o atrakcjach w pobliżu';
+      }
+    } else {
+      throw Exception('Failed to load nearby attractions');
+    }
   }
 
   void _onMarkerDragEnd(String markerId, LatLng newPosition) {
@@ -125,26 +158,60 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void _calculateAndDrawRoute() {
-    _polylines.clear();
-    _polylines.add(Polyline(
-      polylineId: const PolylineId('route'),
-      points: _points,
-      color: Colors.blue,
-      width: 5,
-    ));
+  void _calculateAndDrawRoute() async {
+    if (_points.length < 2) {
+      return;
+    }
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    List<LatLng> routePoints = [];
+
+    for (int i = 0; i < _points.length - 1; i++) {
+      PointLatLng start = PointLatLng(_points[i].latitude, _points[i].longitude);
+      PointLatLng end = PointLatLng(_points[i + 1].latitude, _points[i + 1].longitude);
+
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        "AIzaSyAR_51lpB8C9jjvZrrs0P-ASYrWhJaB5vk",
+        start,
+        end,
+      );
+
+      if (result.points.isNotEmpty) {
+        routePoints.addAll(result.points.map((point) => LatLng(point.latitude, point.longitude)));
+      } else {
+        print('Error fetching route between points $i and ${i + 1}');
+      }
+    }
+
+    setState(() {
+      _polylines.clear();
+      _polylines.add(Polyline(
+        polylineId: const PolylineId('route'),
+        points: routePoints,
+        color: Colors.blue,
+        width: 5,
+      ));
+    });
   }
+
+
 
   void _removeLastPoint() {
     if (_points.isNotEmpty) {
       setState(() {
         var lastMarkerKey = _markers.keys.toList().last;
-        _markers.remove(lastMarkerKey);
+        var secondToLastMarkerKey = _markers.keys.toList()[_markers.length - 2];
+        if (lastMarkerKey != 'currentLocation') {
+          _markers.remove(lastMarkerKey);
+        } else {
+          _markers.remove(secondToLastMarkerKey);
+        }
         _points.removeLast();
         _calculateAndDrawRoute();
       });
     }
   }
+
 
   void _getCurrentLocation() async {
     try {

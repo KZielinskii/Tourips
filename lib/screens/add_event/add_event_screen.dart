@@ -9,7 +9,7 @@ import 'package:tourpis/repository/user_repository.dart';
 import '../../../utils/color_utils.dart';
 import '../../../widgets/widget.dart';
 import '../friends/add_event_request/add_event_friends_screen.dart';
-import '../map/map_screen.dart';
+import '../map/add_map_screen.dart';
 
 
 class AddEventScreen extends StatefulWidget {

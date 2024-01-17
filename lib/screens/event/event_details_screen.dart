@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ import '../../widgets/widget.dart';
 import '../edit_event/edit_event_screen.dart';
 import '../map/display_map_screen.dart';
 import '../payment/payment_home_screen.dart';
+import 'package:http/http.dart' as http;
 
 
 class EventDetailsScreen extends StatefulWidget {
@@ -31,11 +33,14 @@ class EventDetailsScreen extends StatefulWidget {
 
 class EventDetailsView extends State<EventDetailsScreen> {
   late final EventModel event;
+  late List<LatLng> routeLatLng;
+  List<String> pointsInfo = [];
   bool isOwner = false;
   bool isLoading = true;
   bool isOnEvent = false;
   List<UserModel?> participants = [];
   List<UserModel> requests = [];
+
 
   @override
   void initState() {
@@ -48,6 +53,12 @@ class EventDetailsView extends State<EventDetailsScreen> {
       event = (await EventRepository().getEventById(widget.eventId))!;
       participants = await EventParticipantsRepository()
           .getParticipantsByEventId(widget.eventId);
+      routeLatLng = event.route.map(geoPointToLatLng).toList();
+      for(var location in routeLatLng) {
+        String attractionInfo = await getNearestAttractionInfo(location);
+        pointsInfo.add(attractionInfo);
+      }
+
     } catch (e) {
       print("Error downloading event.");
     } finally {
@@ -55,6 +66,34 @@ class EventDetailsView extends State<EventDetailsScreen> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<String> getNearestAttractionInfo(LatLng location) async {
+    const String apiKey = 'AIzaSyAR_51lpB8C9jjvZrrs0P-ASYrWhJaB5vk';
+
+    const String baseUrl =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+
+    final String locationString =
+        '${location.latitude},${location.longitude}';
+    const String radius = '1000';
+
+    final String url =
+        '$baseUrl?location=$locationString&radius=$radius&type=tourist_attraction&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (data.containsKey('results') && data['results'].isNotEmpty) {
+        return data['results'][0]['name'];
+      } else {
+        return 'Brak informacji o atrakcjach w pobliżu';
+      }
+    } else {
+      throw Exception('Failed to load nearby attractions');
     }
   }
 
@@ -125,13 +164,11 @@ class EventDetailsView extends State<EventDetailsScreen> {
                       InkWell(
                         onTap: () {
                           if (event.route.isNotEmpty) {
-                            List<LatLng> routeLatLng =
-                            event.route.map(geoPointToLatLng).toList();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DisplayMapScreen(
-                                  routePoints: routeLatLng,
+                                  routePoints: routeLatLng, pointsInfo: pointsInfo,
                                 ),
                               ),
                             );

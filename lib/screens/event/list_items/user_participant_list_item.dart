@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/repository/event_participants_repository.dart';
 import 'package:tourpis/repository/event_repository.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
-import 'package:tourpis/screens/event/user_participant_list_item_view.dart';
+import 'package:tourpis/screens/event/list_items/user_participant_list_item_view.dart';
 import 'package:tourpis/widgets/widget.dart';
 
-import '../../../../models/UserModel.dart';
+import '../../../../../models/UserModel.dart';
 
 class UserParticipantListItem extends StatefulWidget {
   final UserModel user;

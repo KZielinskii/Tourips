@@ -4,11 +4,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/event_request_repository.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
-import 'package:tourpis/screens/event/user_request_list_item_view.dart';
+import 'package:tourpis/screens/event/list_items/user_request_list_item_view.dart';
 import 'package:tourpis/widgets/widget.dart';
 
-import '../../../../models/UserModel.dart';
-import '../../models/EventModel.dart';
+import '../../../../../models/UserModel.dart';
+import '../../../models/EventModel.dart';
 
 class UserRequestListItem extends StatefulWidget {
   final UserModel user;

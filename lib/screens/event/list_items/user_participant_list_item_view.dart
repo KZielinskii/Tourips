@@ -1,16 +1,16 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../../models/UserModel.dart';
+import '../../../../../models/UserModel.dart';
 
-class UserRequestListItemView extends StatelessWidget {
+class UserParticipantListItemView extends StatelessWidget {
   final ImageProvider image;
   final String buttonText;
   final VoidCallback onPressed;
   final UserModel user;
   final bool isButtonEnabled;
 
-  const UserRequestListItemView({
+  const UserParticipantListItemView({
     super.key,
     required this.image,
     required this.buttonText,
@@ -54,8 +54,16 @@ class UserRequestListItemView extends StatelessWidget {
             const SizedBox(width: 16),
             ElevatedButton.icon(
               onPressed: isButtonEnabled ? onPressed : null,
-              icon: const Icon(Icons.add),
-              label: Text(buttonText),
+              icon: const Icon(
+                Icons.delete_forever,
+                color: Colors.red,
+              ),
+              label: Text(
+                buttonText,
+                style: const TextStyle(
+                  color: Colors.red,
+                ),
+              ),
             ),
           ],
         ),

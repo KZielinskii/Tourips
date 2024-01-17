@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tourpis/screens/friends/add_friends/requests/request_list_item.dart';
+import 'package:tourpis/screens/friends/add_friends/list_items/request_list_item.dart';
 
 import '../../../models/UserModel.dart';
 import '../../../repository/friend_request_repository.dart';

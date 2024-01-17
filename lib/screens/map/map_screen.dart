@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/widgets/widget.dart';
 
-import '../add_event/add_event_view.dart';
+import '../add_event/add_event_screen.dart';
 
 
 const LatLng startPosition = LatLng(52, 20);

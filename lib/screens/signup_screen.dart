@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/stripe_customer_repository.dart';
 import 'package:tourpis/repository/user_repository.dart';

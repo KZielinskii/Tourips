@@ -5,7 +5,7 @@ import '../../models/EventModel.dart';
 import '../../repository/event_repository.dart';
 import '../../utils/color_utils.dart';
 import '../event/event_details_screen.dart';
-import 'event_card.dart';
+import '../home/event_card.dart';
 
 class ArchiveScreen extends StatefulWidget {
   const ArchiveScreen({super.key});

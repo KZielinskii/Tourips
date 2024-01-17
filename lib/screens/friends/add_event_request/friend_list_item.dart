@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
 
 import '../../../../models/UserModel.dart';
-import '../add_friends/users/user_list_item_view.dart';
+import '../add_friends/list_items/user_list_item_view.dart';
 
 class FriendListItem extends StatefulWidget {
   final UserModel user;

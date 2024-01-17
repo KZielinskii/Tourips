@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:tourpis/repository/friend_request_repository.dart';
 import 'package:tourpis/repository/friends_repository.dart';
-import 'package:tourpis/screens/friends/add_friends/requests/request_list_item_view.dart';
+import 'package:tourpis/screens/friends/add_friends/list_items/request_list_item_view.dart';
 import 'package:tourpis/widgets/widget.dart';
 
 import '../../../../models/UserModel.dart';

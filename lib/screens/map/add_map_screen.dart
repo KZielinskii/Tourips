@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/widgets/widget.dart';
+import 'package:http/http.dart' as http;
 
 import '../add_event/add_event_screen.dart';
 
@@ -107,16 +109,46 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void addMarker(String id, LatLng location, {required BitmapDescriptor icon}) {
+  Future<void> addMarker(String id, LatLng location, {required BitmapDescriptor icon}) async {
+    String attractionInfo = await getNearestAttractionInfo(location);
+
     var marker = Marker(
       markerId: MarkerId(id),
       position: location,
-      infoWindow: InfoWindow(title: location.toString()),
+      infoWindow: InfoWindow(title: attractionInfo),
       draggable: true,
       icon: icon,
       onDragEnd: (newPosition) => _onMarkerDragEnd(id, newPosition),
     );
     _markers[id] = marker;
+  }
+
+  Future<String> getNearestAttractionInfo(LatLng location) async {
+    const String apiKey = 'AIzaSyAR_51lpB8C9jjvZrrs0P-ASYrWhJaB5vk';
+
+    const String baseUrl =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json';
+
+    final String locationString =
+        '${location.latitude},${location.longitude}';
+    const String radius = '1000';
+
+    final String url =
+        '$baseUrl?location=$locationString&radius=$radius&type=tourist_attraction&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (data.containsKey('results') && data['results'].isNotEmpty) {
+        return data['results'][0]['name'];
+      } else {
+        return 'Brak informacji o atrakcjach w pobliżu';
+      }
+    } else {
+      throw Exception('Failed to load nearby attractions');
+    }
   }
 
   void _onMarkerDragEnd(String markerId, LatLng newPosition) {

@@ -4,7 +4,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tourpis/widgets/widget.dart';
-import 'package:http/http.dart' as http;
 
 import '../add_event/add_event_screen.dart';
 
@@ -127,15 +126,43 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void _calculateAndDrawRoute() {
-    _polylines.clear();
-    _polylines.add(Polyline(
-      polylineId: const PolylineId('route'),
-      points: _points,
-      color: Colors.blue,
-      width: 5,
-    ));
+  void _calculateAndDrawRoute() async {
+    if (_points.length < 2) {
+      return;
+    }
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    List<LatLng> routePoints = [];
+
+    for (int i = 0; i < _points.length - 1; i++) {
+      PointLatLng start = PointLatLng(_points[i].latitude, _points[i].longitude);
+      PointLatLng end = PointLatLng(_points[i + 1].latitude, _points[i + 1].longitude);
+
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        "AIzaSyAR_51lpB8C9jjvZrrs0P-ASYrWhJaB5vk",
+        start,
+        end,
+      );
+
+      if (result.points.isNotEmpty) {
+        routePoints.addAll(result.points.map((point) => LatLng(point.latitude, point.longitude)));
+      } else {
+        print('Error fetching route between points $i and ${i + 1}');
+      }
+    }
+
+    setState(() {
+      _polylines.clear();
+      _polylines.add(Polyline(
+        polylineId: const PolylineId('route'),
+        points: routePoints,
+        color: Colors.blue,
+        width: 5,
+      ));
+    });
   }
+
+
 
   void _removeLastPoint() {
     if (_points.isNotEmpty) {

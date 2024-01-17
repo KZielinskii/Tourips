@@ -200,12 +200,18 @@ class _MapScreenState extends State<MapScreen> {
     if (_points.isNotEmpty) {
       setState(() {
         var lastMarkerKey = _markers.keys.toList().last;
-        _markers.remove(lastMarkerKey);
+        var secondToLastMarkerKey = _markers.keys.toList()[_markers.length - 2];
+        if (lastMarkerKey != 'currentLocation') {
+          _markers.remove(lastMarkerKey);
+        } else {
+          _markers.remove(secondToLastMarkerKey);
+        }
         _points.removeLast();
         _calculateAndDrawRoute();
       });
     }
   }
+
 
   void _getCurrentLocation() async {
     try {

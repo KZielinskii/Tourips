@@ -45,6 +45,28 @@ class EventRequestRepository {
     return events;
   }
 
+  Future<List<EventModel>> getAllRequestsForAndFromUser() async {
+
+    String? userId = await UserRepository().getCurrentUserId();
+
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await _db.collection('event_requests').where('userId', isEqualTo: userId!).get();
+
+    List<EventModel> events = [];
+
+    for (QueryDocumentSnapshot<Map<String, dynamic>> doc in querySnapshot.docs) {
+      String eventId = doc['eventId'];
+      EventModel? event = await getEventById(eventId);
+
+      if (event != null) {
+        event.id = eventId;
+        events.add(event);
+      }
+    }
+
+    return events;
+  }
+
   Future<List<UserModel>> getRequestsForEvent(String eventId) async {
 
     QuerySnapshot<Map<String, dynamic>> querySnapshot =

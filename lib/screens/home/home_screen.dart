@@ -82,7 +82,28 @@ class HomeScreenState extends State<HomeScreen> {
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProfileScreen(),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: 25.0,
+                child: _getImageWidget(),
+              ),
+            ),
+          ),
+        ],
       ),
+
       drawer: Drawer(
         backgroundColor: Colors.white,
         child: ListView(
@@ -350,48 +371,6 @@ class HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * 0.05,
-                vertical: MediaQuery.of(context).size.height * 0.02,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: "Szukaj...",
-                          contentPadding: EdgeInsets.all(10),
-                          prefixIcon: Icon(Icons.search),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProfileScreen()),
-                      );
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 25.0,
-                      child: _getImageWidget(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             Expanded(
               child: _selectedIndex == 0
                   ? const HomeEventsPage()

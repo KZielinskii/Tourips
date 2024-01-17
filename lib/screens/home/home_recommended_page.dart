@@ -18,7 +18,31 @@ class HomeRecommendedPage extends StatefulWidget {
 class _HomeRecommendedPageState extends State<HomeRecommendedPage> {
   final EventRepository eventRepository = EventRepository();
   List<EventModel> events = [];
+  List<EventModel> filteredEvents = [];
+  List<EventModel> requestsForUser = [];
   Set<String> disabledJoinButtons = {};
+
+  @override
+  void initState() {
+    super.initState();
+    loadRequestsForUser();
+  }
+
+  Future<void> loadRequestsForUser() async {
+    try {
+      List<EventModel> requests = await EventRequestRepository().getAllRequestsForAndFromUser();
+      setState(() {
+        requestsForUser = requests;
+      });
+    } catch (e) {
+      print('Błąd podczas pobierania zapytań: $e');
+    }
+  }
+
+  bool isRequestSent(String eventId) {
+    return requestsForUser.any((request) => request.id == eventId);
+  }
+
 
   void goToEventDetails(BuildContext context, String eventId) {
     Navigator.push(
@@ -34,43 +58,91 @@ class _HomeRecommendedPageState extends State<HomeRecommendedPage> {
     final GlobalKey<RefreshIndicatorState> refreshIndicatorState =
     GlobalKey<RefreshIndicatorState>();
 
-    return RefreshIndicator(
-      key: refreshIndicatorState,
-      onRefresh: () async {
-        List<EventModel> refreshedEvents = await eventRepository.getOtherEvents();
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.05,
+            vertical: MediaQuery.of(context).size.height * 0.02,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: TextFormField(
+                    onChanged: (value) {
+                      setState(() {
+                        filteredEvents = events
+                            .where((event) =>
+                            event.title.toLowerCase().contains(value.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                    decoration: const InputDecoration(
+                      hintText: "Szukaj...",
+                      contentPadding: EdgeInsets.all(10),
+                      prefixIcon: Icon(Icons.search),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: RefreshIndicator(
+            key: refreshIndicatorState,
+            onRefresh: () async {
+              List<EventModel> refreshedEvents =
+              await eventRepository.getOtherEvents();
 
-        setState(() {
-          events = refreshedEvents;
-        });
-      },
-      child: FutureBuilder<List<EventModel>>(
-        key: UniqueKey(),
-        future: eventRepository.getOtherEvents(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text(
-                'Wystąpił błąd podczas przetwarzania danych: ${snapshot.error}');
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nie znaleziono wydarzeń'));
-          } else {
-            events = snapshot.data!;
+              setState(() {
+                events = refreshedEvents;
+              });
+            },
+            child: FutureBuilder<List<EventModel>>(
+              key: UniqueKey(),
+              future: eventRepository.getOtherEvents(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text(
+                      'Wystąpił błąd podczas przetwarzania danych: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Nie znaleziono wydarzeń'));
+                } else {
+                  events = snapshot.data!;
+                  List<EventModel> displayedEvents =
+                  filteredEvents.isNotEmpty ? filteredEvents : events;
 
-            return ListView.builder(
-              itemCount: events.length,
-              itemBuilder: (context, index) {
-                final event = events[index];
-                return GestureDetector(
-                  onTap: () => goToEventDetails(context, event.id!),
-                  child: EventCardWithButton(event: event, handleJoinRequest: () => handleJoinRequest(event),
-                    isButtonEnabled: !disabledJoinButtons.contains(event.id), ),
-                );
+                  return ListView.builder(
+                    itemCount: displayedEvents.length,
+                    itemBuilder: (context, index) {
+                      final event = displayedEvents[index];
+                      return GestureDetector(
+                        onTap: () => goToEventDetails(context, event.id!),
+                        child: EventCardWithButton(
+                          event: event,
+                          handleJoinRequest: () => handleJoinRequest(event),
+                          isButtonEnabled: !disabledJoinButtons.contains(event.id) &&
+                              !isRequestSent(event.id!),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
-            );
-          }
-        },
-      ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

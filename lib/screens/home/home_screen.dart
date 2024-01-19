@@ -382,12 +382,12 @@ class HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.event_note),
-            label: 'Wydarzenia',
+            icon: Icon(Icons.event_available),
+            label: 'Nadchodzące wydarzenia',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.reviews),
-            label: 'Rekomendowane',
+            icon: Icon(Icons.event),
+            label: 'Dołącz do wydarzeń',
           ),
         ],
         currentIndex: _selectedIndex,

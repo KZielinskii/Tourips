@@ -135,66 +135,6 @@ class EventDetailsView extends State<EventDetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (isOnEvent)InkWell(
-                        onTap: () {
-                          setState(() {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PaymentHomeScreen(eventId: widget.eventId,),
-                              ),
-                            );
-                          });
-                        },
-                        child: Column(
-                          children: [
-                            iconButton(Icons.monetization_on_outlined, false),
-                            const SizedBox(height: 8.0),
-                            const Text(
-                              'Rozliczanie',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      InkWell(
-                        onTap: () {
-                          if (event.route.isNotEmpty) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DisplayMapScreen(
-                                  routePoints: routeLatLng, pointsInfo: pointsInfo,
-                                ),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'Brak punktów do wyświetlenia na mapie.'),
-                              ),
-                            );
-                          }
-                        },
-                        child: Column(
-                          children: [
-                            iconButton(Icons.map_sharp, false),
-                            const SizedBox(height: 8.0),
-                            const Text(
-                              'Mapa',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
                   Card(
                     color: Colors.white,
                     elevation: 5.0,
@@ -275,6 +215,66 @@ class EventDetailsView extends State<EventDetailsScreen> {
                         ],
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (isOnEvent)InkWell(
+                        onTap: () {
+                          setState(() {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PaymentHomeScreen(eventId: widget.eventId,),
+                              ),
+                            );
+                          });
+                        },
+                        child: Column(
+                          children: [
+                            iconButton(Icons.monetization_on_outlined, false),
+                            const SizedBox(height: 8.0),
+                            const Text(
+                              'Rozliczanie',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16.0),
+                      InkWell(
+                        onTap: () {
+                          if (event.route.isNotEmpty) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DisplayMapScreen(
+                                  routePoints: routeLatLng, pointsInfo: pointsInfo,
+                                ),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Brak punktów do wyświetlenia na mapie.'),
+                              ),
+                            );
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            iconButton(Icons.map_sharp, false),
+                            const SizedBox(height: 8.0),
+                            const Text(
+                              'Mapa',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   if (isOwner)

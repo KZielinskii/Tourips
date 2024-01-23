@@ -147,6 +147,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<bool> correctPassword() async {
+    if (_passwordTextController.text == ""||
+    _passwordRepeatTextController.text == "") {
+      createSnackBarError("Nie wypełniono wszystkich pól.", context);
+      return false;
+    }
     if (_passwordTextController.text != _passwordRepeatTextController.text) {
       createSnackBarError("Hasła nie są takie same.", context);
       return false;

@@ -105,6 +105,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           print("Error ${error.toString()}");
                         });
                       } else {
+                        setState(() {
+                          isLoading = false;
+                        });
                         return;
                       }
                     }),

@@ -138,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            title: const Text("Zmiana hasła:"),
+            title: const Text("Zmiana hasła:", style: TextStyle(color: Colors.white),),
             content: Column(
               children: [
                 reusableTextField(
@@ -166,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.black87,
             actions: [
               TextButton(
                 onPressed: () async {

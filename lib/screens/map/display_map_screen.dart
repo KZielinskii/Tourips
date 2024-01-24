@@ -50,7 +50,7 @@ class _DisplayMapScreenState extends State<DisplayMapScreen> {
               : widget.routePoints.isNotEmpty
               ? widget.routePoints.first
               : const LatLng(0, 0),
-          zoom: 15,
+          zoom: 13,
         ),
         markers: _buildMarkers(widget.routePoints),
         polylines: _polylines,
@@ -58,6 +58,7 @@ class _DisplayMapScreenState extends State<DisplayMapScreen> {
           mapController = controller;
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _moveToCurrentLocation();
@@ -157,8 +158,9 @@ class _DisplayMapScreenState extends State<DisplayMapScreen> {
 
   void _moveToCurrentLocation() {
     if (currentPosition != null) {
-      mapController.animateCamera(CameraUpdate.newLatLng(
+      mapController.animateCamera(CameraUpdate.newLatLngZoom(
         LatLng(currentPosition!.latitude, currentPosition!.longitude),
+        10
       ));
     }
   }

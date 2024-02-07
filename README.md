@@ -204,4 +204,41 @@ ProfileScreen to ekran profilu użytkownika w aplikacji, który zapewnia użytko
 ![Zrzut ekranu 2024-01-25 002353](https://github.com/KZielinskii/Tourips/assets/58587948/fe70e397-d524-4a7d-b0a6-fd247e4b4fac)
 ![Zrzut ekranu 2024-01-25 002402](https://github.com/KZielinskii/Tourips/assets/58587948/d11e97e9-3f2f-44fb-b2c4-44210164c6e9)
 
+"ArchiveScreen" to ekran w aplikacji umożliwiający użytkownikowi przeglądanie archiwalnych wydarzeń. Składa się z AppBar, którego tytuł to "Archiwum", oraz listy wydarzeń zakończonych. Każdy element listy reprezentuje jedno archiwalne wydarzenie i jest renderowany przy użyciu widoku EventCard. Po kliknięciu w dany element listy, użytkownik przechodzi do ekranu szczegółów wydarzenia (EventDetailsScreen).
+
+![Zrzut ekranu 2024-01-25 004835](https://github.com/KZielinskii/Tourips/assets/58587948/8865c9ec-6553-4a66-8a91-40de0b5b51e3)
+
+### Tworzenie, wyświetlanie i edycja wydarzeń
+
+"AddEventScreen" to ekran w aplikacji, który umożliwia użytkownikowi dodawanie nowego wydarzenia. Składa się z AppBar o tytule "Dodaj wydarzenie" oraz formularza zawierającego pola takie jak tytuł, opis, limit uczestników, datę i godzinę rozpoczęcia oraz zakończenia wydarzenia. Dodatkowo, użytkownik może wybrać lokalizację wydarzenia na mapie i zaprosić znajomych do udziału. Poniżej są kluczowe elementy i funkcje tego ekranu:
+• Pola Formularza - Użytkownik może wprowadzić dane takie jak tytuł, opis, limit uczestników, oraz wybierać datę i godzinę rozpoczęcia i zakończenia wydarzenia.
+• Wybór Daty i Godziny - Użytkownik może wybrać datę i godzinę rozpoczęcia oraz zakończenia wydarzenia za pomocą przycisków.
+• Mapa - Użytkownik może wybrać lokalizację wydarzenia na mapie. Po naciśnięciu na ikonę "Mapa" otwiera się ekran z mapą, gdzie użytkownik może zaznaczyć trasę wydarzenia. Trasa zostaje zapisana, a użytkownik otrzymuje odpowiedni komunikat.
+• Zaproszenia do Wydarzenia - Użytkownik może zaprosić znajomych do udziału w wydarzeniu. Po naciśnięciu na ikonę "Zaproś", użytkownik przechodzi do ekranu wyboru znajomych (AddEventFriendsListScreen), gdzie może wybrać osoby, które chce zaprosić.
+• Floating Action Button - Po wypełnieniu formularza i zaznaczeniu lokalizacji na mapie, użytkownik może nacisnąć przycisk z ikoną "check", aby dodać wydarzenie. Przycisk ten wywołuje funkcję addEvent, która sprawdza poprawność wprowadzonych danych i dodaje nowe wydarzenie.
+• Snackbars - W przypadku błędów lub powodzenia operacji, na ekranie wyświetlają się Snackbars z odpowiednimi komunikatami.
+• Repozytoria - Ekran korzysta z różnych repozytoriów, takich jak UserRepository, EventRepository, EventRequestRepository, i EventParticipantsRepository, do komunikacji z bazą danych Firebase.
+
+![Zrzut ekranu 2024-01-25 010226](https://github.com/KZielinskii/Tourips/assets/58587948/4a8b52b7-5f84-446e-99b7-e5528ad3b28c)
+![Zrzut ekranu 2024-01-25 010239](https://github.com/KZielinskii/Tourips/assets/58587948/20d4dba0-f2a1-415b-91af-87d4ebb33b03)
+
+"EventDetailsScreen" to ekran w aplikacji, który wyświetla szczegółowe informacje na temat konkretnego wydarzenia. Składa się z informacji ogólnych o wydarzeniu, listy uczestników, przycisków nawigacyjnych do sekcji związanych z rozliczeniami, mapą oraz edycją i usunięciem wydarzenia. Poniżej są kluczowe funkcje tego ekranu:
+• AppBar - Wyświetla tytuł wydarzenia na pasku aplikacji. W trakcie ładowania wyświetla informację "Ładowanie...".
+• Informacje o Wydarzeniu - Po załadowaniu informacji o wydarzeniu, prezentuje informacje ogólne, takie jak opis, daty rozpoczęcia i zakończenia, liczba uczestników oraz przyciski nawigacyjne.
+• Mapa z Trasą Wydarzenia - Wyświetla mapę z trasą wydarzenia. Po naciśnięciu przycisku "Mapa", otwiera się ekran z interaktywną mapą, na której zaznaczono trasę wydarzenia oraz najbliższe atrakcje turystyczne.
+• Lista Uczestników - Wyświetla listę uczestników wydarzenia. Każdy uczestnik jest interaktywny, umożliwiając dostęp do prywatnego czatu.
+• Przyciski dla Właściciela Wydarzenia - Jeśli zalogowany użytkownik jest właścicielem wydarzenia, dodatkowo wyświetlane są przyciski umożliwiające edycję wydarzenia, usunięcie wydarzenia oraz lista osób, które chcą dołączyć do wydarzenia.
+
+![Zrzut ekranu 2024-01-25 010936](https://github.com/KZielinskii/Tourips/assets/58587948/a1658785-8116-453a-9dfa-fa9e5b7000f3)
+![Zrzut ekranu 2024-01-25 010648](https://github.com/KZielinskii/Tourips/assets/58587948/2e73fe4f-c5f4-4a24-839c-337ee8d4eb7e)
+![Zrzut ekranu 2024-01-25 011202](https://github.com/KZielinskii/Tourips/assets/58587948/4a9c9c9d-8fdd-4e26-8de7-c5f7d299e36b)
+
+"EditEventScreen" to ekran edycji wydarzenia w aplikacji. Pozwala użytkownikowi na zmianę i zapisanie różnych danych dotyczących wydarzenia, takich jak tytuł, opis, limit uczestników, daty rozpoczęcia i zakończenia, oraz trasę wydarzenia na mapie.
+• AppBar - Wyświetla tytuł "Edytuj wydarzenie" na pasku aplikacji.
+• Pola Tekstowe do Edycji Informacji o Wydarzeniu - Dostarcza pola tekstowe do wprowadzenia i edycji różnych informacji, takich jak tytuł, opis, limit uczestników.
+• Przyciski Wyboru Daty i Godziny - Przyciski te pozwalają na wybór daty i godziny rozpoczęcia oraz zakończenia wydarzenia. Po naciśnięciu przycisku, użytkownikowi ukazują się odpowiednie okna wyboru daty i godziny.
+• Edycja Trasy na Mapie - Przycisk "Edytuj trasę" otwiera ekran do edycji trasy wydarzenia na mapie.
+• Floating Action Button - Pozwala na zapisanie wprowadzonych zmian w informacjach o wydarzeniu. Przed zapisaniem dokonuje się walidacji, sprawdzając m.in. poprawność daty i godziny.
+
+![Zrzut ekranu 2024-01-25 013658](https://github.com/KZielinskii/Tourips/assets/58587948/f442d25e-dd42-4212-be63-730e1e4ea967)
 

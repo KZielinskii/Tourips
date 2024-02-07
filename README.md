@@ -139,4 +139,69 @@ W celu dodania użytkownika do listy znajomych, konieczne jest rozwinięcie menu
 
 ![Zrzut ekranu 2024-01-24 201246](https://github.com/KZielinskii/Tourips/assets/58587948/87f37b62-673f-46c3-855d-99632105b6ef)
 
+Zakładka “Użytkownicy” wyświetla ekran "InvitationsFragment" to fragment interfejsu użytkownika, który umożliwia użytkownikowi przeglądanie i zarządzanie zaproszeniami do znajomych. Poniżej przedstawiono kluczowe elementy i funkcje tego fragmentu:
+• Lista Zaproszeń - Fragment prezentuje listę zaproszeń do znajomych w interfejsie wertykalnej listy. Dane dotyczące zaproszeń są pobierane z repozytorium FriendRequestRepository. Używany jest StreamController, aby dynamicznie odświeżać widok w czasie rzeczywistym. Każdy element listy reprezentuje jedno zaproszenie i jest renderowany przy użyciu widoku RequestListItem. Widok RequestListItem zawiera informacje o użytkowniku, który wysłał zaproszenie, oraz przyciski akceptacji lub odrzucenia użytkownika do grona znajomych.
+• Aktualizacja Listy - Kiedy użytkownik akceptuje lub odrzuca zaproszenie, lista jest aktualizowana poprzez usunięcie odpowiedniego elementu.
+• Wskaźnik Ładowania - W przypadku, gdy dane są jeszcze ładowane, wyświetlany jest wskaźnik ładowania (CircularProgressIndicator), aby poinformować użytkownika o trwającym procesie pobierania danych.
+• Komunikat Braku Zaproszeń - Jeżeli użytkownik nie otrzymał jeszcze żadnych zaproszeń, wyświetlony zostaje odpowiedni komunikat informacyjny.
+
+![Zrzut ekranu 2024-01-24 201308](https://github.com/KZielinskii/Tourips/assets/58587948/723eda1a-b06f-4788-93a5-68fac36eb630)
+![Zrzut ekranu 2024-01-24 201318](https://github.com/KZielinskii/Tourips/assets/58587948/886bb77b-3288-40c7-9a7f-f07bcb74d1cc)
+
+Aby otworzyć konwersację z wybranym użytkownikiem, wystarczy wybrać jego nazwę z menu. Dodatkowo istnieje możliwość skorzystania z listy uczestników wydarzenia, aby przenieść się bezpośrednio do czatu z daną osobą. Ekran czatu (ChatScreen) jest interaktywnym interfejsem, który umożliwia użytkownikowi komunikację tekstową z innym użytkownikiem. Poniżej przedstawiono krótki opis funkcji tego ekranu:
+• AppBar - Górny pasek aplikacji zawiera tytuł czatu, który jest nazwą użytkownika, z którym obecnie prowadzony jest czat.
+• Lista wiadomości - To obszar, w którym są wyświetlane wszystkie wiadomości wysłane w ramach danego czatu. Wiadomości są układane w sposób chronologiczny, a każda z nich jest renderowana jako komponent Container zawierający tekst wiadomości, opakowany w odpowiednią dekorację w zależności od tego, czy została wysłana przez aktualnego użytkownika czy przez rozmówcę.
+• Pole wprowadzania wiadomości - To interaktywne pole tekstowe, w którym użytkownik może wprowadzić tekst nowej wiadomości. Po wpisaniu wiadomości użytkownik może ją wysłać, naciskając przycisk w postaci ikony strzałki.
+• Wysyłanie wiadomości - Wiadomości są wysyłane za pomocą przycisku z ikoną strzałki. Tekst wprowadzony przez użytkownika jest przesyłany do repozytorium ChatRepository, które zarządza komunikacją związana z czatem.
+• Odbieranie wiadomości - Wiadomości są pobierane w czasie rzeczywistym za pomocą strumieni dostarczanych przez repozytorium ChatRepository. Każda wiadomość jest renderowana jako element listy, a rozmieszczenie wiadomości na ekranie zależy od tego, kto ją wysłał - użytkownik czy rozmówca.
+• Firebase Authentication i Firestore - Do uwierzytelniania użytkowników oraz przechowywania i pobierania danych dotyczących czatu wykorzystywane są Firebase Authentication oraz Firestore.
+
+![Zrzut ekranu 2024-01-24 211201](https://github.com/KZielinskii/Tourips/assets/58587948/c65a890a-2566-4ad8-b7d0-5e56b2bd277b)
+![Zrzut ekranu 2024-01-24 211319](https://github.com/KZielinskii/Tourips/assets/58587948/2f3d4a87-8144-4656-89a9-a32ca8dcd056)
+
+### Ekran główny wydarzeń
+
+HomeScreen to główny ekran aplikacji, który zapewnia nawigację i dostęp do różnych funkcji. Poniżej przedstawiono krótki opis funkcji tego ekranu:
+• AppBar - Górny pasek aplikacji zawiera “Hamburger menu” umożliwiający otwarciesię Draweru z dodatkowymi opcjami, tytuł “Wydarzenia” oraz ikonę użytkownika umożliwiającą dostęp do profilu.
+• Górna sekcja ekranu - Jest to obszar, który jest zmienny w zależności od aktualnie wybranej zakładki. Domyślnie wyświetlane są nadchodzące wydarzenia, ale użytkownik może przełączać się między zakładkami "Nadchodzące wydarzenia" a "Dołącz do wydarzeń".
+• Dolna sekcja ekranu - Dolna część ekranu to pasek nawigacyjny (BottomNavigationBar) umożliwiający przełączanie się między zakładkami "Nadchodzące wydarzenia" a "Dołącz do wydarzeń". Wybór zakładki wpływa na wyświetlaną zawartość górnej sekcji.
+• Przycisk dodawania wydarzenia - W prawym dolnym rogu ekranu znajduje się przycisk "Dodaj wydarzenie", który po naciśnięciu przenosi użytkownika do ekranu dodawania nowego wydarzenia.
+• Wykorzystanie Firebase - Ekran korzysta z Firebase do uwierzytelniania użytkowników, przechowywania zdjęcia profilowego w chmurze, a także do pobierania informacji o znajomych i zaproszeniach do wydarzeń.
+
+Nawigacja boczna (Drawer) zawiera kilka opcji:
+• Dodaj Znajomych - Pozwala użytkownikowi dodawać nowych znajomych. Wyświetla ilość zaproszeń do znajomych.
+• Dołącz do Wydarzeń - Przenosi do ekranu, gdzie użytkownik może dołączać do różnych wydarzeń. Wyświetla ilość zaproszeń do wydarzeń.
+• Archiwum - Otwiera archiwum, gdzie użytkownik może przeglądać zarchiwizowane wydarzenia.
+• Lista Znajomych - Wyświetla listę znajomych, z którymi użytkownik może rozpocząć czat.
+
+HomeEventsPage to widget, który zawiera zarówno pole wyszukiwania, jak i listę wydarzeń. Odpowiednio dostosowuje się do dostępnego miejsca, co sprawia, że jest to wygodny sposób prezentacji listy wydarzeń z możliwością filtrowania. Poniżej przedstawiono krótki opis funkcji i struktury tego widgetu:
+• Wyszukiwarka wydarzeń - Na górze strony znajduje się pole wyszukiwania, które umożliwia użytkownikowi filtrowanie wydarzeń na podstawie tytułów. Po wprowadzeniu tekstu w polu wyszukiwania, wyświetlane są tylko te wydarzenia, których tytuły zawierają wpisany tekst.
+• Lista wydarzeń - Główna treść strony zawiera listę wydarzeń. Wydarzenia są pobierane z repozytorium (EventRepository) za pomocą przyszłej wartości (FutureBuilder). W przypadku oczekiwania na dane wyświetlany jest wskaźnik postępu, a w przypadku błędu użytkownik informowany jest o problemie.
+• Odświeżanie listy - Użytkownik może odświeżyć listę, przeciągając w dół. Wykorzystywany jest do tego RefreshIndicator, a aktualizacja listy polega na ponownym pobraniu wydarzeń z repozytorium i zaktualizowaniu stanu widgetu.
+• Przejście do szczegółów wydarzenia - Po naciśnięciu na dane wydarzenie (EventCard), użytkownik jest przekierowywany do ekranu szczegółów wydarzenia (EventDetailsScreen), gdzie może uzyskać więcej informacji na temat danego wydarzenia.
+• Dynamiczne filtrowanie - Filtrowanie wydarzeń jest dynamiczne, co oznacza, że lista wydarzeń jest automatycznie aktualizowana w zależności od wprowadzanego tekstu w polu wyszukiwania.
+
+![Zrzut ekranu 2024-01-24 235419](https://github.com/KZielinskii/Tourips/assets/58587948/b5cdd1b8-4341-4d33-96f6-6a8f2a83047d)
+![Zrzut ekranu 2024-01-24 235451](https://github.com/KZielinskii/Tourips/assets/58587948/4c1f9efd-4e38-479a-a84b-9540beeae870)
+
+HomeRecommendedPage to kolejny widget, reprezentujący stronę z wydarzeniami, do których użytkownik może dołączyć. Poniżej przedstawiono krótki opis funkcji i struktury tego widgetu:
+• Wyszukiwarka wydarzeń - Podobnie jak w poprzednim widżecie, na górze strony znajduje się pole wyszukiwania, pozwalające użytkownikowi na filtrowanie wydarzeń na podstawie ich tytułów. Wprowadzenie tekstu w polu wyszukiwania spowoduje wyświetlenie tylko tych wydarzeń, których tytuły zawierają wpisany tekst.
+• Lista wydarzeń - Główna treść strony zawiera listę wydarzeń, pobieranychz repozytorium (EventRepository) za pomocą przyszłej wartości (FutureBuilder). W przypadku oczekiwania na dane wyświetlany jest wskaźnik postępu, a w przypadku błędu użytkownik informowany jest o problemie.
+• Odświeżanie listy - Użytkownik może odświeżyć listę, przeciągając w dół. Wykorzystywany jest do tego RefreshIndicator, a aktualizacja listy polega na ponownym pobraniu rekomendowanych wydarzeń z repozytorium i zaktualizowaniu stanu widgetu.
+• Przejście do szczegółów wydarzenia - Po naciśnięciu na dane wydarzenie (EventCardWithButton), użytkownik jest przekierowywany do ekranu szczegółów wydarzenia (EventDetailsScreen), gdzie może uzyskać więcej informacji na temat danego wydarzenia.
+• Dynamiczne filtrowanie - Filtrowanie wydarzeń jest dynamiczne, co oznacza, że lista wydarzeń jest automatycznie aktualizowana w zależności od wprowadzanego tekstu w polu wyszukiwania.
+• Obsługa przycisku dołączania - Każde wydarzenie ma przycisk, który pozwala użytkownikowi wysłać prośbę o dołączenie do wydarzenia (handleJoinRequest). Przycisk ten jest wyłączany (isButtonEnabled) w przypadku, gdy prośba o dołączenie została już wysłana.
+
+![Zrzut ekranu 2024-01-25 000823](https://github.com/KZielinskii/Tourips/assets/58587948/b700921b-98a6-4266-a4c9-70eea2edb099)
+
+ProfileScreen to ekran profilu użytkownika w aplikacji, który zapewnia użytkownikowi interaktywny interfejs do zarządzania danymi swojego profilu, w tym zdjęciem profilowym, loginem i hasłem. Poniżej znajdziesz ogólny opis funkcji tego widżetu:
+• Zdjęcie profilowe - Umożliwia użytkownikowi wybór swojego zdjęcia profilowego z galerii telefonu. Zdjęcie jest przesyłane i przechowywane w Firebase Storage pod ścieżką 'images/${user.uid}.png'. Zdjęcie profilowe jest wyświetlane w okrągłym obszarze, a w przypadku braku obrazu, pojawia się ikona domyślna. Kliknięcie na zdjęcie profilowe otwiera okno wyboru nowego obrazu z galerii.
+• Dane użytkownika - Pobiera dane użytkownika, takie jak login i adres e-mail, z Firebase Authentication i repozytorium użytkownika. Login użytkownika jest edytowalny przyciskiem edycji, który umożliwia przełączanie między trybem edycji a trybem odczytu.
+• Zmiana hasła - Użytkownik może zmienić swoje hasło, podając aktualne hasło, nowe hasło i powtórzenie nowego hasła. Walidacja hasła przed zaktualizowaniem hasła sprawdza kryteria, takie jak długość, obecność cyfr i znaków specjalnych. Przycisk "Aktualizuj hasło" wywołuje funkcję changePassword, która sprawdza poprawność nowego hasła i aktualizuje je w Firebase Authentication.
+• Przycisk wylogowania - Użytkownik ma możliwość wylogowania się z aplikacji, co prowadzi do wywołania funkcji FirebaseAuth.instance.signOut() i przeniesieniado ekranu logowania (SignInScreen).
+
+![Zrzut ekranu 2024-01-25 002045](https://github.com/KZielinskii/Tourips/assets/58587948/bddada7a-40c2-4f08-9434-ac97b12bc3ba)
+![Zrzut ekranu 2024-01-25 002353](https://github.com/KZielinskii/Tourips/assets/58587948/fe70e397-d524-4a7d-b0a6-fd247e4b4fac)
+![Zrzut ekranu 2024-01-25 002402](https://github.com/KZielinskii/Tourips/assets/58587948/d11e97e9-3f2f-44fb-b2c4-44210164c6e9)
+
 

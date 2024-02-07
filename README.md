@@ -78,5 +78,7 @@ Ekran BalanceScreen to interaktywny interfejs użytkownika skoncentrowany na wy�
 • Usuwanie Długu - Funkcja removeDebt służy do utworzenia nowego wpisu w historii płatności (PaymentsRepository), informującego o zwrocie kosztów. To pozwala na zaktualizowanie listy sald na ekranie.
 
 ![Zrzut ekranu 2024-01-24 162104](https://github.com/KZielinskii/Tourips/assets/58587948/fb20ad8d-114c-4094-ae4c-7c9345734ac6)
-
+![Zrzut ekranu 2024-01-24 162220](https://github.com/KZielinskii/Tourips/assets/58587948/c7555bed-8f73-4229-8281-022cbea5da12)
+![Zrzut ekranu 2024-01-24 163025](https://github.com/KZielinskii/Tourips/assets/58587948/2ee1571b-f37e-48c6-b880-0da1a721bf8d)
+![Zrzut ekranu 2024-01-24 163039](https://github.com/KZielinskii/Tourips/assets/58587948/1046f51f-7bd5-4d22-848f-ed7d22d9355f)
 

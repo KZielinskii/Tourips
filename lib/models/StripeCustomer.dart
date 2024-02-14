@@ -34,8 +34,11 @@ class StripeCustomer {
   static DateTime _parseTimestamp(dynamic timestamp) {
     if (timestamp is Timestamp) {
       return timestamp.toDate();
+    } else if (timestamp is int) {
+      return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
     } else {
-      throw FormatException('Invalid timestamp format');
+      throw const FormatException('Invalid timestamp format');
     }
   }
+
 }
